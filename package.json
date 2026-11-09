@@ -1,0 +1,13 @@
+{
+  "name": "arduino_moist_fullstack",
+  "version": "1.0.0",
+  "description": "This backend will hoist both the back and front managing and saving result to the database of the soil",
+  "license": "ISC",
+  "author": "OBAMA MULONDO VICTOR & MUHIRWA JUSTIN",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "node backend/tests/index.js",
+    "dev:backend" : "node ./moistBackend/server.js"
+  }
+}
