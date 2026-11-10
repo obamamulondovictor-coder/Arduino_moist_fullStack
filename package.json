@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node backend/tests/index.js",
-    "dev:backend" : "node ./moistBackend/server.js"
+    "dev:backend" : "npx nodemon ./moistBackend/server.js",
+    "dev:frontend" : ""
   }
 }

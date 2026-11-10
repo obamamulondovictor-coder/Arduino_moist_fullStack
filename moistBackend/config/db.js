@@ -1,5 +1,6 @@
+require("dotenv").config({path : ".env.local"});
 const mysql = require("mysql2/promise");
-require("dotenv").config();
+
 
 
 const pool = mysql.createPool({
@@ -9,7 +10,7 @@ const pool = mysql.createPool({
     database : process.env.MYSQL_DATABASE ?? "soilSystemDB"
 });
 
-module.exports = pool.promise();
+module.exports = pool;
 
 
 //immediate excution function to test and return and stop closing the connection
@@ -19,6 +20,7 @@ module.exports = pool.promise();
     const connection = await pool.getConnection();
     if (connection) {
         return console.log("Database connection successful");
+        
     } else  {
         return console.error("Database connection failed");
     }

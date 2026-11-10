@@ -14,6 +14,9 @@ app.use(cors({
 
 //load the routes which is in the controller
 const soilRoute = require("./Routes/soildRoute.route");
+const deviceRoute = require("./Routes/device.route");
+
+app.use("/device" , deviceRoute);
 app.use("/soil" , soilRoute);
 
 

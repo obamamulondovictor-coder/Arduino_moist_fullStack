@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <title>AgriSense irrigation icon</title>
+  <desc>A green leaf, water droplet and irrigation furrows representing smart agricultural watering.</desc>
+  <style>
+    :root {
+      --bg: #F5FAF4;
+      --green: #16834A;
+      --green-deep: #0F6338;
+      --accent: #35BFA6;
+      --line: #FFFFFF;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #101914;
+        --green: #42BD70;
+        --green-deep: #248B50;
+        --accent: #54DCC4;
+        --line: #F5FAF4;
+      }
+    }
+  </style>
+
+  <!-- Main tile: green is the dominant brand colour; the background provides contrast. -->
+  <rect x="4" y="4" width="120" height="120" rx="29" fill="var(--bg)"/>
+  <path d="M64 13C42 13 23 31 23 54c0 22 17 39 39 39 23 0 43-19 43-43 0-13-6-25-16-32"
+        fill="var(--green)" opacity=".12"/>
+
+  <!-- Leaf -->
+  <path d="M34 72C34 43 57 25 94 25c1 34-15 59-43 63-10 1-17-5-17-16Z"
+        fill="var(--green)"/>
+  <path d="M42 81C55 65 69 51 88 37" fill="none" stroke="var(--line)"
+        stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M60 62c-1-9-7-15-15-18M69 54c9 1 15 5 19 12"
+        fill="none" stroke="var(--line)" stroke-width="3.5" stroke-linecap="round" opacity=".9"/>
+
+  <!-- Water drop -->
+  <path d="M94 54c-7 10-13 17-13 25a13 13 0 0 0 26 0c0-8-6-15-13-25Z"
+        fill="var(--accent)" stroke="var(--bg)" stroke-width="3"/>
+  <path d="M91 79c0-3 2-6 4-9" fill="none" stroke="var(--line)"
+        stroke-width="3" stroke-linecap="round" opacity=".9"/>
+
+  <!-- Irrigated field furrows -->
+  <path d="M25 101c11-7 22-7 33 0s22 7 33 0"
+        fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M35 112c8-4 16-4 24 0s16 4 24 0"
+        fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round"/>
+</svg>

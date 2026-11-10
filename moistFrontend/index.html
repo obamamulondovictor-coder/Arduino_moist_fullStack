@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./public/agri_dark.svg" id="relIcon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agri-Farm Watering System</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <script defer>
+  (() => {
+    let savedTheme = localStorage.getItem("theme");
+
+    if (!savedTheme) {
+      savedTheme = "white";
+      setTheme(savedTheme);
+     return  localStorage.setItem("theme", savedTheme);
+    }
+
+  if(savedTheme === "black") {
+    document.documentElement.classList.add("dark");
+          const relImage = document.getElementById("relIcon");
+      if (relImage) {
+            relImage.href = "./agri_dark.svg";
+          }
+
+          return;
+
+  }
+
+    setTheme(savedTheme);
+
+    function setTheme(theme) {
+      const relImage = document.getElementById("relIcon");
+      if (!relImage) return;
+
+      if (theme === "dark") {
+        relImage.href = "./agri_dark.svg";
+        document.documentElement.classList.add("dark"); // Optional: triggers Tailwind dark mode
+      } else {
+        relImage.href = "./agri_white.svg";
+        document.documentElement.classList.remove("dark"); // Optional: triggers Tailwind light mode
+      }
+    }
+  })();
+</script>
+  </body>
+</html>

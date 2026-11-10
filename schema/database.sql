@@ -1,6 +1,9 @@
 CREATE TABLE devices (
   device_id VARCHAR(30) PRIMARY KEY,       -- Uses the MAC address as the unique primary key
-  device_name VARCHAR(100) NOT NULL,       -- e.g., "Greenhouse Sector A"
+  device_name VARCHAR(100) NOT NULL,
+  ip_address VARCHAR(50) DEFAULT NULL,
+  operating_mode ENUM('auto', 'manual') DEFAULT 'auto',
+  pump_state ENUM('OFF', 'ON') DEFAULT 'OFF';       -- e.g., "Greenhouse Sector A"
   location VARCHAR(100),                   -- e.g., "Block 2, Field 3"
   status ENUM('active', 'inactive', 'maintenance') DEFAULT 'active',
   registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

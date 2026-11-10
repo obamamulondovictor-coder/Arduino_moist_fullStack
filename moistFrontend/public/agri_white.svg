@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">AgriSense irrigation icon — light mode</title>
+  <desc id="desc">A green leaf, turquoise water droplet and green irrigation furrows on a clean white background.</desc>
+  <rect width="128" height="128" rx="29" fill="#FFFFFF"/>
+  <circle cx="64" cy="64" r="53" fill="#16834A" opacity=".055"/>
+  <path d="M30 73C30 43 54 22 96 23c1 37-16 63-46 68-12 2-20-6-20-18Z" fill="#16834A"/>
+  <path d="M39 83C54 66 70 49 89 35" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M57 65c-1-9-7-15-15-19M68 55c9 1 16 5 20 12" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" opacity=".95"/>
+  <path d="M96 53c-7 10-14 18-14 26a14 14 0 0 0 28 0c0-8-7-16-14-26Z" fill="#35BFA6" stroke="#FFFFFF" stroke-width="3"/>
+  <path d="M92 80c0-4 2-7 5-10" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+  <path d="M22 101c12-7 23-7 35 0s23 7 35 0" fill="none" stroke="#16834A" stroke-width="5" stroke-linecap="round"/>
+  <path d="M34 112c8-4 16-4 24 0s16 4 24 0" fill="none" stroke="#35BFA6" stroke-width="4" stroke-linecap="round"/>
+</svg>

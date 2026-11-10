@@ -1,7 +1,7 @@
 const soilService = require("../Service/soilService.service");
 
 
-async function postSoilStatus(req , res) {
+async function getSoilStatus(req , res) {
 
     try {
         const {device_id , moisture , temperature , mode } = req;
@@ -18,7 +18,7 @@ async function postSoilStatus(req , res) {
 
         return res.status(201).json({ 
       success: true, 
-      message: 'Data saved successfully',
+      message: result.autoRegistered ? "Soil reading recorded and device auto-registered successfully" : "Soil reading recorded successfully",
       device_id: device_id,
       insertId: result.insertId 
     });
@@ -31,4 +31,6 @@ async function postSoilStatus(req , res) {
 
 }
 
-module.exports = {postSoilStatus}
+
+
+module.exports = {getSoilStatus}
