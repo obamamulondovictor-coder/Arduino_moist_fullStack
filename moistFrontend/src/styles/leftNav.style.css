@@ -1,0 +1,25 @@
+.crop-bg-image{
+    background-image: url("../assets/crop.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.overlay-behind {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0, 40, 20, 0.92) 0%,
+            rgba(0, 55, 28, 0.72) 40%,
+            rgba(0, 40, 20, 0.15) 100%
+        ),
+        linear-gradient(
+            0deg,
+            rgba(0, 35, 18, 0.75) 0%,
+            transparent 65%
+        );
+}

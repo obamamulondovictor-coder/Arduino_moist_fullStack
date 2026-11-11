@@ -1,24 +1,180 @@
+import "../styles/landing.style.css";
+import { Link } from "react-router";
+import { FaArrowRight } from "react-icons/fa";
+import { FaPhoneAlt } from "react-icons/fa";
+import {sileo , Toaster} from "sileo";
+
 export default function LandingPage() {
+  function handleProjectInfoClick() {
+    let mode = localStorage.getItem("theme");
+
+    if(!mode){
+      mode = "white";
+    }
+
+    const projectInfo = {
+      title: "Project In Progress",
+      description: "This is the system of the smart irrigation with soil moisture sensor project. The project is still in progress and will be updated soon.",
+fill: mode === "dark" ? "#0f172a" : "#ffffff",
+            styles: {
+                title: mode === "dark" ? "text-white!" : "text-gray-900!",
+                description: mode === "dark" ? "text-white/75!" : "text-gray-600!",
+            },
+
+    };
+        sileo.info(projectInfo);
+  }
+
+  function handleContactSupportClick() {
+    let mode = localStorage.getItem("theme");
+    sileo.success({
+  title: "Contact Information",
+  icon: <FaPhoneAlt className="size-3.5" />,
+  description: (
+    <span className="text-green-500/50! font-medium!">
+      For support, please contact us at: <br />
+      <a href="mailto:obamamulondo6@gmail.com" className="text-blue-500 hover:text-blue-700">
+        obamamulondo6@gmail.com
+      </a> <br />
+      or call us at: <br />
+      <a href="tel:+250787880064" className="text-blue-500 hover:text-blue-700">
+        +250 787 880 064
+      </a>
+    </span>
+  ),
+});
+
+  }
+
     return (
-      <>
-      
- <div className="flex flex-col gap-10 p-15">
-         <div className="text-2xl">
-        <p>Smart Agriculture</p>
-        <p>for a <span className="text-green-600 font-bold">Better</span></p>
-        <p className="text-green-600 font-bold">Tomorrow</p>
-      </div>
-      <div>
-        <p className="p-10 font-serif">
-            Innovative agriTech solution to increse productivity, sustainability, and profitability.
-        </p>
-      </div>
-      <div>
-        <button>
-            Get to The Dashboard
-        </button>
-      </div>
- </div>
-      </>
+        <div className="
+            flex flex-col
+            gap-6 sm:gap-8 lg:gap-10
+            p-6 sm:p-10 lg:p-15
+            bg-image
+            min-h-screen w-full
+        ">
+
+            <div className="overlay-behind"></div>
+
+            {/* Main Heading */}
+            <div className="
+                text-4xl sm:text-5xl lg:text-6xl
+                font-sans font-medium text-white
+                leading-wide
+            ">
+                <p>Smart Agriculture</p>
+
+                <p>
+                    for a <span className="text-green-500 font-bold">Better</span>
+                </p>
+
+                <p className="text-green-500 font-bold">
+                    Tomorrow
+                </p>
+            </div>
+
+            {/* Description */}
+            <div>
+                <p className="
+                    p-2 sm:p-5
+                    w-full max-w-md
+                    text-white
+                    tracking-wider
+                    text-base sm:text-lg
+                    font-normal leading-relaxed
+                ">
+                    Innovative agriTech solutions to increase productivity,
+                    sustainability, and profitability.
+                </p>
+            </div>
+
+            {/* Dashboard Button */}
+            <div>
+                <Link
+                    to="/dashboard"
+                    className="
+                        inline-flex items-center gap-2
+                        text-black
+                        hover:border-2 hover:border-gray-300
+                        transition-all ease-in
+                        duration-300
+                        hover:gap-2.5
+                        font-bold
+                        button-color
+                        px-5 py-4 sm:p-5
+                        border-2 rounded-2xl
+                        text-sm sm:text-base
+                        hover:shadow-lg hover:shadow-gray-500/25
+                    "
+                >
+                    Get to The Dashboard
+
+                    <span className="text-black inline-block">
+                        <FaArrowRight />
+                    </span>
+                </Link>
+            </div>
+
+            {/* Additional Information */}
+            <div className="w-full max-w-3xl">
+
+                <p className="
+                    text-gray-300
+                    text-xs sm:text-sm
+                    leading-relaxed
+                    max-w-2xl
+                ">
+                    Get More Experience By Exploring Our Features and
+                    Understanding How They Can Benefit Your Farming Operations
+                </p>
+
+                {/* Action Buttons */}
+                <div className="
+                    flex flex-wrap
+                    gap-3 sm:gap-5
+                    mt-5
+                    justify-start items-center
+                ">
+
+                    <button className="
+                        px-4 sm:px-6 py-3
+                        rounded-2xl font-semibold
+                        border-2 border-slate-300 dark:border-slate-700
+                        bg-white dark:bg-slate-900
+                        text-slate-800 dark:text-slate-200
+                        hover:border-emerald-500
+                        hover:bg-emerald-50 dark:hover:bg-emerald-950/40
+                        hover:text-emerald-600 dark:hover:text-emerald-400
+                        transition-all duration-200 shadow-sm
+                        text-sm sm:text-base
+                    " onClick={handleProjectInfoClick}>
+                        Project Information
+                    </button>
+
+                    <button className="
+                        px-4 sm:px-6 py-3
+                        rounded-2xl font-semibold
+                        bg-slate-900 dark:bg-emerald-600
+                        text-white
+                        hover:bg-emerald-600 dark:hover:bg-emerald-500
+                        hover:shadow-lg hover:shadow-emerald-500/25
+                        transition-all duration-200
+                        text-sm sm:text-base
+                    " onClick={handleContactSupportClick}>
+                        Contact Support
+                    </button>
+
+                    <a
+                        href="https://www.cropin.com/blogs/iot-in-agriculture/"
+                        className="text-blue-500 hover:text-blue-700 text-sm sm:text-base"
+                    target="_blank" rel="noopener noreferrer">
+                        Learn More
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
     );
 }
