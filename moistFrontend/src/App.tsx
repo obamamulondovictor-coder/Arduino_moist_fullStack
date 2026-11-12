@@ -1,8 +1,7 @@
 import { Routes, Route } from "react-router";
-import { sileo, Toaster } from "sileo";
 import LandingPage from "./components/landingPage";
 import Dashboard from "./components/dashboard";
-import { useEffect } from "react";
+
 
 
 export default function App() {
