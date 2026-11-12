@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Firjar:wght@100..800&display=swap');
+
 .bg-image{
   background-image: url("../assets/landing_image.png");
   background-position: center;
@@ -10,7 +12,7 @@
 }
 
 .button-color {
-    background-color: rgb(104, 192, 9);
+    background-color: #009966; /*    rgb(104, 192, 9) */
 }
 
 .bg-image {
@@ -37,4 +39,14 @@
             rgba(0, 35, 18, 0.75) 0%,
             transparent 65%
         );
+}
+
+
+.firjar-font {
+  font-family: "Firjar", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
 }

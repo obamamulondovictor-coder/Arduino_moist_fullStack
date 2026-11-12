@@ -1,4 +1,9 @@
+@import url("https://googleapis.com");
 @import "tailwindcss";
+
+@theme {
+  --font-roboto: "Roboto", sans-serif;
+}
 
 /* Desktop */
 [data-sileo-viewport] {
