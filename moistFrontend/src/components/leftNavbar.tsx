@@ -5,70 +5,85 @@ import { GoAlert } from "react-icons/go";
 import { CiSettings } from "react-icons/ci";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 
-import "../styles/leftNav.style.css"
+import "../styles/leftNav.style.css";
 
+export default function LeftNavbar({ activePage, setActivePage }) {
 
+    const handleNavigation = (page) => {
+        setActivePage(page);
+    };
 
-export default function LeftNavbar() {
     return (
-        <aside className="bg-emerald-950 w-72 h-screen p-6 flex flex-col justify-between shrink-0 select-none text-white border-r border-emerald-900/40">
-            {/* Top Brand Section */}
+        /* Using bg-green-950/60 makes it blend into your glass container while keeping your green theme */
+        <div className="bg-green-950/60 border-r border-white/10 h-full p-5 w-64 flex flex-col justify-between text-white shrink-0">
+            
             <div>
-                <div className="flex items-center gap-3 px-2 mb-10">
-                    <img src="logo.png" alt="Agri Sense Logo" className="w-10 h-10 rounded-full object-cover bg-emerald-800" />
-                    <div className="text-2xl">
-                        <h1 className="font-bold font-sans tracking-wide text-lg text-emerald-50 leading-tight">AgriSense</h1>
-                        <p className="text-xs text-gray-400 font-medium">Smart Agriculture</p>
-                    </div>
+                {/* The heading AgriSense */}
+                <div className="flex items-center gap-3 mb-8 px-2">
+                    <img src="../assets/logo.png" alt="Logo Of AgriSense" className="w-8 h-8 object-contain" />
+                    <span className="text-xl font-bold tracking-wide text-emerald-300">AgriSense</span>
                 </div>
 
-                {/* Navigation Links */}
-                <nav className="space-y-1.5 font-medium text-sm">
-                    <a href="#dashboard" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-900/50">
-                        <span><IoHomeOutline /></span> Dashboard
-                    </a>
-                    <a href="#devices" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-emerald-200/70 hover:bg-emerald-900/60 hover:text-white transition">
-                        <span><MdOutlineBugReport /></span> Devices
-                    </a>
-                   
-                    <a href="#reports" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-emerald-200/70 hover:bg-emerald-900/60 hover:text-white transition">
-                        <span><TbReport /></span> Reports
-                    </a>
-                    <a href="#notifications" className="flex items-center justify-between px-4 py-3 rounded-2xl text-emerald-200/70 hover:bg-emerald-900/60 hover:text-white transition">
-                        <span className="flex items-center gap-3.5"><span><GoAlert /></span> Notifications</span>
-                        <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
-                    </a>
-                    <a href="#settings" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-emerald-200/70 hover:bg-emerald-900/60 hover:text-white transition">
-                        <span><CiSettings /></span> Settings
-                    </a>
-                    <a href="#help" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-emerald-200/70 hover:bg-emerald-900/60 hover:text-white transition">
-                        <span><IoIosHelpCircleOutline /></span> Help & Support
-                    </a>
-                </nav>
-            </div>
+                {/* The navigation menus */}
+                <div className="flex flex-col gap-2">
+                    
+                    {/* Dashboard / Main Button */}
+                    <button 
+                        onClick={() => handleNavigation("main")}
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+                            activePage === "main" 
+                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
+                                : "text-slate-300 hover:bg-white/10"
+                        }`}
+                    >
+                        <IoHomeOutline className="text-xl" />
+                        Dashboard
+                    </button>
 
-            {/* Bottom Promo & User Profile */}
-            <div className="space-y-4">
-                {/* Promo Card */}
-                <div className="crop-bg-image h-40 rounded-sm w-full relative">
-                    <div className="overlay-behind"></div>
-                 
-                </div>
+                    {/* Analytics / Reports Button */}
+                    <button 
+                        onClick={() => handleNavigation("analytics")}
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+                            activePage === "analytics" 
+                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
+                                : "text-slate-300 hover:bg-white/10"
+                        }`}
+                    >
+                        <TbReport className="text-xl" />
+                        Analytics
+                    </button>
 
-                {/* User Profile */}
-                <div className="flex items-center justify-between pt-3 border-t border-emerald-900">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-emerald-800 flex items-center justify-center font-bold text-sm text-emerald-200">
-                            CN
-                        </div>
-                        <div className="overflow-hidden">
-                            <h4 className="text-xs font-bold text-white truncate">Charles Niyomugabo</h4>
-                            <p className="text-[10px] text-emerald-400 truncate">Admin-Manager</p>
-                        </div>
-                    </div>
-                    <span className="text-emerald-400 text-xs">▼</span>
+                    {/* Devices Button */}
+                    <button 
+                        onClick={() => handleNavigation("device")}
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+                            activePage === "device" 
+                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
+                                : "text-slate-300 hover:bg-white/10"
+                        }`}
+                    >
+                        <MdOutlineBugReport className="text-xl" />
+                        Devices
+                    </button>
+
                 </div>
             </div>
-        </aside>
+
+            {/* Bottom Menu (Settings & Help) */}
+            <div className="flex flex-col gap-2 border-t border-white/10 pt-4">
+                <button 
+                    onClick={() => handleNavigation("settings")}
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+                        activePage === "settings" 
+                            ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
+                            : "text-slate-300 hover:bg-white/10"
+                    }`}
+                >
+                    <CiSettings className="text-xl" />
+                    Settings
+                </button>
+            </div>
+
+        </div>
     );
 }
