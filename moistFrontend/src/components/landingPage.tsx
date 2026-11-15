@@ -4,9 +4,9 @@ import { Link } from "react-router";
 import { FaArrowRight, FaPhoneAlt } from "react-icons/fa";
 import { sileo, Toaster } from "sileo";
 
+type ToastPosition = "bottom-left" | "top-center" | "bottom-center" | "bottom-right";
 
 export default function LandingPage() {
-  type ToastPosition = "bottom-left" | "top-center" | "bottom-center" | "bottom-right";
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const [deskTopPos, setDeskTopPos] = useState<ToastPosition>("bottom-left");
 
@@ -37,7 +37,7 @@ export default function LandingPage() {
   }
 
   function handleContactSupportClick() {
-    const targetPos: ToastPosition = isMobile ? "top-center" : "bottom-right";
+    const targetPos: ToastPosition = "top-center";
     setDeskTopPos(targetPos);
 
     const mode = localStorage.getItem("theme") || "white";
