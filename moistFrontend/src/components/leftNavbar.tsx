@@ -39,6 +39,18 @@ export default function LeftNavbar({ activePage, setActivePage }) {
                         <IoHomeOutline className="text-xl" />
                         Dashboard
                     </button>
+                    {/* Devices Button */}
+                    <button 
+                        onClick={() => handleNavigation("device")}
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+                            activePage === "device" 
+                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
+                                : "text-slate-300 hover:bg-white/10"
+                        }`}
+                    >
+                        <MdOutlineBugReport className="text-xl" />
+                        Devices
+                    </button>
 
                     {/* Analytics / Reports Button */}
                     <button 
@@ -52,19 +64,38 @@ export default function LeftNavbar({ activePage, setActivePage }) {
                         <TbReport className="text-xl" />
                         Analytics
                     </button>
-
-                    {/* Devices Button */}
-                    <button 
-                        onClick={() => handleNavigation("device")}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                            activePage === "device" 
+{/* Notification Button */}
+                    <button
+                    onClick={() => handleNavigation("notification")}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+                            activePage === "analytics" 
                                 ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
                                 : "text-slate-300 hover:bg-white/10"
-                        }`}
-                    >
-                        <MdOutlineBugReport className="text-xl" />
-                        Devices
+                        }`}>
+Notification
                     </button>
+                    {/* settings button */}
+                       <button
+                    onClick={() => handleNavigation("settings")}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+                            activePage === "analytics" 
+                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
+                                : "text-slate-300 hover:bg-white/10"
+                        }`}>
+Settings
+                    </button>
+                    {/* help and support */}
+
+                             <button
+                    onClick={() => handleNavigation("help")}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+                            activePage === "analytics" 
+                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
+                                : "text-slate-300 hover:bg-white/10"
+                        }`}>
+Help & Support
+                    </button>
+
 
                 </div>
             </div>
