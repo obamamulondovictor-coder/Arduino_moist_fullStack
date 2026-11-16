@@ -2,6 +2,9 @@ import { useState } from "react";
 import LeftNavbar from "./leftNavbar";
 
 // Import the page components
+import HelpPage from "./pages/helpSupport";
+import SettingPage from "./pages/setting";
+import NotificationPage from "./pages/notification";
 import Analytics from "./pages/analytics";
 import Device from "./pages/device";
 import Main from "./pages/mainDash";
@@ -9,16 +12,27 @@ import Main from "./pages/mainDash";
 export default function Dashboard() {
     const [activePage, setActivePage] = useState("main");
 
+    //const a , setA
+
     // Your page switcher
     const renderPage = () => {
         if (activePage === "main") {
             return <Main />;
         }
-        else if (activePage === "analytics") {
+        else if (activePage === "analytic") {
             return <Analytics />;
         }
         else if (activePage === "device") {
             return <Device />;
+        }
+        else if (activePage === "notification" ){
+            return <NotificationPage />
+        }
+        else if (activePage === "setting"){
+            return <SettingPage />
+        }
+        else if (activePage === "help"){
+            return <HelpPage />
         }
         else {
             return <div className="p-8 text-white">Settings Page</div>;
