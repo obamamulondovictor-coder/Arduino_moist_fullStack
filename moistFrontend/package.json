@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "chart.js": "^4.6.1",
     "driver.js": "^1.14.0",
     "react": "^19.3.1",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.3.1",
     "react-icon": "^1.0.0",
     "react-icons": "^5.7.0",
