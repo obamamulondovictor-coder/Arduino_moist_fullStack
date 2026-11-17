@@ -18,13 +18,12 @@ import { IoSearch, IoNotificationsOutline } from "react-icons/io5";
 
 export default function MainDash() {
   const [isOnline, setIsOnline] = useState(false);
-  const [wantedData , setWantedData] = useState("days")
+  const [wantedData, setWantedData] = useState("days");
+  // const [activeData, setActiveData] = useState("days");
 
-  const handleWantedData = (data:String) => {
-    setWantedData(data)
-  }
-
-
+  const handleWantedData = (data: String) => {
+    setWantedData(data);
+  };
 
   const getCurrentTheme = localStorage.getItem("theme") || "white";
 
@@ -184,15 +183,49 @@ export default function MainDash() {
             {/* sensor trend data chartjs */}
             <div>
               <div>
-                Sensort Trend
-                <div className="flex justify-between">
-                  <button className="h-2 w-2 p-2" onClick={() => handleWantedData("hour")}>Hours</button>
-                  <button className="h-2 w-2 p-2" onClick={() => handleWantedData("days")}>Days</button>
-                <button   className="h-2 w-2 p-2" onClick={() => handleWantedData("month")}>Month</button>
+                Sensor Trend
+                <div className="flex flex-row gap-2 w-fit h-fit p-1.5 bg-gray-200/20 rounded">
+                  <button
+                    className={`px-3 py-1 rounded hover:bg-gray-300/10 transition-delay transition-color ${wantedData === "hour" ? "bg-green-500/30 border" : ""} `}
+                    onClick={() => handleWantedData("hour")}
+                  >
+                    Hours
+                  </button>
+                  <button
+                    className={`px-3 py-1 rounded hover:bg-gray-300/10 transition-delay transition-color ${wantedData === "days" ? "bg-green-500/30 border" : ""} `}
+                    onClick={() => handleWantedData("days")}
+                  >
+                    Days
+                  </button>
+                  <button
+                    className={`px-3 py-1 rounded hover:bg-gray-300/10 transition-delay transition-color ${wantedData === "month" ? "bg-green-500/30 border" : ""} `}
+                    onClick={() => handleWantedData("month")}
+                  >
+                    Month
+                  </button>
                 </div>
               </div>
+
               <div>
                 <LineChart wantedData={wantedData} />
+              </div>
+            </div>
+            {/* system alert and view all navigation */}
+            <div>
+              <div></div>
+              <div>
+                {/* static alert  */}
+
+                <div>
+                  {/* low water level alert */}
+                  <div></div>
+                  <div></div>
+                </div>
+                <div>
+                  {/* device status alert one offline or online by the time */}
+                  <div></div>
+                  <div></div>
+                </div>
               </div>
             </div>
           </div>

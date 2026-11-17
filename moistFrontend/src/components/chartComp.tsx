@@ -73,7 +73,7 @@ const MoistDataMonth = [
 ];
 
 
-
+//add the prop to pass the active data in the range to mark it as active
 
 const LineChart = ({wantedData}: {wantedData :String}) => {
      let label = null;
@@ -82,6 +82,7 @@ const LineChart = ({wantedData}: {wantedData :String}) => {
   if (wantedData === 'hour') {
     label = MoistDataHour.map((data) => data.hour);
     chartValues = MoistDataHour.map((data) => data.SoilMoisture);
+
   } else if (wantedData === 'month') {
     label = MoistDataMonth.map((data) => data.month);
     chartValues = MoistDataMonth.map((data) => data.SoilMoisture);
@@ -122,7 +123,7 @@ const LineChart = ({wantedData}: {wantedData :String}) => {
 
   return (
     <div style={{ width: "100%", maxWidth: "700px", margin: "0 auto" }}>
-      <h1 style={{ color: "#805AD5" }}>Line Chart</h1>
+      <h1 style={{ color: "#805AD5" }}>Soild Trending Chart</h1>
       <Line data={data} options={option} />
     </div>
   );
