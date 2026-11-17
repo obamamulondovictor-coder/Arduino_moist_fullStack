@@ -10,9 +10,7 @@ import Device from "./pages/device";
 import Main from "./pages/mainDash";
 
 export default function Dashboard() {
-    const [activePage, setActivePage] = useState("main");
-
-    //const a , setA
+    const [activePage, setActivePage]:String = useState("main");
 
     // Your page switcher
     const renderPage = () => {
@@ -41,7 +39,7 @@ export default function Dashboard() {
 
     return (
         /* 1. Outermost container with the crop/irrigation background image */
-        <div className="relative w-full h-screen bg-cover bg-center flex items-center justify-center p-4 md:p-8 overflow-hidden"
+        <div className="relative w-full h-screen bg-cover bg-center flex items-center justify-center p-4 md:p-4 overflow-hidden overflow-x-hidden overflow-y-auto scrollbar-thumb-emerald-500/20"
              style={{ backgroundImage: "url('./greens.png')" }}>
             
             {/* Dark green overlay so the glass containers pop out clearly */}

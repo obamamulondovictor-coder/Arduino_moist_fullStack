@@ -11,9 +11,9 @@ import { IoIosHelpCircleOutline } from "react-icons/io";
 
 import "../styles/leftNav.style.css";
 
-export default function LeftNavbar({ activePage, setActivePage }) {
+export default function LeftNavbar({ activePage, setActivePage } : {activePage:String , setActivePage:String}) {
 
-    const handleNavigation = (page) => {
+    const handleNavigation = (page:String) => {
         setActivePage(page);
     };
 

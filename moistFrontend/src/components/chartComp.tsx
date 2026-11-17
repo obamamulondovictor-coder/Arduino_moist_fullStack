@@ -125,6 +125,7 @@ const LineChart = ({wantedData}: {wantedData :String}) => {
     <div style={{ width: "100%", maxWidth: "700px", margin: "0 auto" }}>
       <h1 style={{ color: "#805AD5" }}>Soild Trending Chart</h1>
       <Line data={data} options={option} />
+      
     </div>
   );
 };
