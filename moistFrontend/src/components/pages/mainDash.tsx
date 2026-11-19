@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-
 import { LuSunMoon } from "react-icons/lu";
 import { IoMdMoon } from "react-icons/io";
 import { MdDeviceUnknown, MdAutoDelete, MdWarning } from "react-icons/md";
@@ -9,126 +8,66 @@ import { FaArrowRight, FaRegEye } from "react-icons/fa";
 import { CiWifiOn, CiWifiOff } from "react-icons/ci";
 import { VscDebugRestart } from "react-icons/vsc";
 import { IoSettingsOutline, IoSearch } from "react-icons/io5";
-
 import LineChart from "../chartComp";
-
 export default function MainDash() {
-  const [isOnline, setIsOnline] = useState(false);
-  const [wantedData, setWantedData] = useState("days");
-  // search and save Value
-  const [searchValue , setSearchValue] = useState('');
-  const [searchHistory , setSearchHistory] = useState<String[]>(() =>{ return JSON.parse(localStorage.getItem("searchValue") || '[]') })
+  const [isOnline] = useState<boolean>(true);
+  const [wantedData, setWantedData] = useState<string>("days");
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [theme, setTheme] = useState<string>(localStorage.getItem("theme") || "white");
+  const searchRef = useRef<HTMLInputElement>(null);
 
-
-  const saveHistory = (data:String) => {
-    const value = data.trim();
-
-    if(!value) return
-   
-    setSearchHistory((previous) => {
-
-      if(previous.some((data) => data.toLowerCase() === value.toLocaleLowerCase())){
-        return previous;
-        
-      }
-
-      
-      const updated = [
-        value , 
-        ...previous
-      ].slice(0, 10);
-
-      localStorage.setItem("searchValue" , JSON.stringify(updated))
-
-      return updated
-
-    })
-  }
   const handleWantedData = (data: string) => {
     setWantedData(data);
   };
 
-  const getCurrentTheme = localStorage.getItem("theme") || "white";
-
-  // ================= THEME TOGGLE =================
-
   const handleThemeToggle = () => {
-    const currentMode = localStorage.getItem("theme") || "white";
-    const newMode = currentMode === "dark" ? "white" : "dark";
-
+    const newMode: string = theme === "dark" ? "white" : "dark";
+    setTheme(newMode);
     localStorage.setItem("theme", newMode);
 
-    const relImage = document.getElementById(
-      "relIcon",
-    ) as HTMLLinkElement | null;
-
+    const relImage = document.getElementById("relIcon") as HTMLLinkElement | null;
     if (newMode === "dark") {
       document.documentElement.classList.add("dark");
-      if (relImage) relImage.href = "./agri_dark.svg";
+      if (relImage) relImage.href = "/agri_dark.svg";
     } else {
       document.documentElement.classList.remove("dark");
-      if (relImage) relImage.href = "./agri_white.svg";
+      if (relImage) relImage.href = "/agri_white.svg";
     }
-
-    window.location.reload();
   };
 
-  
-
-  const searchRef = useRef<HTMLInputElement>(null);
-// handle the focus of the element
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
       if (
         event.key === "/" &&
-        !["INPUT", "TEXTAREA"].includes(
-          (event.target as HTMLElement)?.tagName,
-        ) &&
+        !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement)?.tagName) &&
         !(event.target as HTMLElement)?.isContentEditable
       ) {
         event.preventDefault();
         searchRef.current?.focus();
       }
-    };
-    window.addEventListener("keydown", handleShortcut);
-
-    return () => {
-      window.removeEventListener("keydown", handleShortcut);
-    };
-  }, []);
-  // escape the focus of the input
-  useEffect(() => {
-    const handleShortcut = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         searchRef.current?.blur();
       }
     };
-
     window.addEventListener("keydown", handleShortcut);
-
     return () => {
       window.removeEventListener("keydown", handleShortcut);
     };
   }, []);
-  //save the text input after debouce
 
   useEffect(() => {
-  const timer = setTimeout(() => {
-    try{
-  
-     if(searchValue.trim()){
-      saveHistory(searchValue)
-     }
-
-    }catch(error) {
-      console.log("Failed To Save Search Result")
-    }
-  } ,3000)
-
-  return () => {
-    clearTimeout(timer)
-  }
-  } , [searchValue])
+    const timer = setTimeout(() => {
+      const value: string = searchValue.trim();
+      if (!value) return;
+      const prev: string[] = JSON.parse(localStorage.getItem("searchValue") || "[]");
+      if (!prev.some((item: string) => item.toLowerCase() === value.toLowerCase())) {
+        localStorage.setItem("searchValue", JSON.stringify([value, ...prev].slice(0, 8)));
+      }
+    }, 1200);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchValue]);
 
   return (
     <>
@@ -210,7 +149,7 @@ export default function MainDash() {
                 className="p-2.5 rounded-lg text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-white/10 transition-all cursor-pointer text-xl"
                 title="Toggle Theme"
               >
-                {getCurrentTheme === "white" ? <LuSunMoon /> : <IoMdMoon />}
+                {theme === "white" ? <LuSunMoon /> : <IoMdMoon />}
               </button>
 
               {/* DIVIDER */}

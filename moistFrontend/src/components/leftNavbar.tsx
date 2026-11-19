@@ -1,141 +1,79 @@
 import { IoHomeOutline } from "react-icons/io5";
 import { MdOutlineBugReport } from "react-icons/md";
-import { TbReport } from "react-icons/tb";
 import { MdOutlineAnalytics } from "react-icons/md";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { IoMdHelpCircleOutline } from "react-icons/io";
-
-import { GoAlert } from "react-icons/go";
 import { CiSettings } from "react-icons/ci";
-import { IoIosHelpCircleOutline } from "react-icons/io";
-
 import "../styles/leftNav.style.css";
 
-export default function LeftNavbar({ activePage, setActivePage } : {activePage:String , setActivePage:String}) {
+export default function LeftNavbar({
+  activePage,
+  setActivePage,
+}: {
+  activePage: string;
+  setActivePage: (page: string) => void;
+}) {
+  const handleNavigation = (page: string) => {
+    setActivePage(page);
+  };
 
-    const handleNavigation = (page:String) => {
-        setActivePage(page);
-    };
+  const itemClass = (page: string): string => {
+    if (activePage === page) {
+      return "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all bg-emerald-500/30 border border-emerald-400/40 font-semibold text-white";
+    }
+    return "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all text-slate-300 hover:bg-white/10";
+  };
 
-    return (
-        /* Using bg-green-950/60 makes it blend into your glass container while keeping your green theme */
-        <div className="bg-green-950/60 border-r overflow-auto overflow-x-hidden scrollbar-thumb-emerald-500/40 scroll border-white/10 h-full scroll-auto p-5 w-64 flex flex-col justify-between text-white shrink-0">
-            
-            <div>
-                {/* The heading AgriSense */}
-                <div className="flex items-center gap-3 mb-8 px-2">
-                   <div className="">
-                    <img src="./logo.png" alt="Logo Of AgriSense" className="w-full h-full object-contain" />
-                   </div>
-                    <div className="flex flex-col gap-0.5 mt-0">
-                        <span className="text-xl font-bold tracking-wide text-gray-200">AgriSense</span>
-                    <p className="text-sm">Smart Agriculture</p>
-                    </div>
-                </div>
-
-                {/* The navigation menus */}
-                <div className="flex flex-col gap-2">
-                    
-                    {/* Dashboard / Main Button */}
-                    <button 
-                        onClick={() => handleNavigation("main")}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                            activePage === "main" 
-                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
-                                : "text-slate-300 hover:bg-white/10"
-                        }`}
-                    >
-                        <IoHomeOutline className="text-xl" />
-                        Dashboard
-                    </button>
-                    {/* Devices Button */}
-                    <button 
-                        onClick={() => handleNavigation("device")}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                            activePage === "device" 
-                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
-                                : "text-slate-300 hover:bg-white/10"
-                        }`}
-                    >
-                        <MdOutlineBugReport className="text-xl" />
-                        Devices
-                    </button>
-
-                    {/* Analytics / Reports Button */}
-                    <button 
-                        onClick={() => handleNavigation("analytic")}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                            activePage === "analytic" 
-                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
-                                : "text-slate-300 hover:bg-white/10"
-                        }`}
-                    >
-                       
-                        <MdOutlineAnalytics className="text-xl" />
-                        Report
-                    </button>
-{/* Notification Button */}
-                    <button
-                    onClick={() => handleNavigation("notification")}
-                      className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                            activePage === "notification" 
-                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
-                                : "text-slate-300 hover:bg-white/10"
-                        }`}>
-                            <IoIosNotificationsOutline className="text-xl" />
-Notification
-                    </button>
-                    {/* settings button */}
-                       <button
-                    onClick={() => handleNavigation("setting")}
-                      className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                            activePage === "setting" 
-                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
-                                : "text-slate-300 hover:bg-white/10"
-                        }`}>
-                             <CiSettings className="text-xl" />
-Settings
-                    </button>
-                    {/* help and support */}
-
-                             <button
-                    onClick={() => handleNavigation("help")}
-                      className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                            activePage === "help" 
-                                ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
-                                : "text-slate-300 hover:bg-white/10"
-                        }`}>
-                            <IoMdHelpCircleOutline className="text-xl" />
-Help & Support
-                    </button>
-
-
-                </div>
-            </div>
-
-            {/* Bottom Menu (Settings & Help) */}
-            <div className="flex flex-col gap-2 border-t border-white/10 pt-4">
-                <button 
-                    onClick={() => handleNavigation("profile")}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                        activePage === "profile" 
-                            ? "bg-emerald-500/30 border border-emerald-400/40 font-bold text-white shadow-md" 
-                            : "text-slate-300 hover:bg-white/10"
-                    }`}
-                >
-                   
-                    <div className="">
-<img src="" alt="Profile avatar image" />
-                    </div>
-                    <div>
-                        <div className="text-sm">
-                            <p>Obama Mulondo Victor</p>
-                            <p>Admin</p>
-                        </div>
-                    </div>
-                </button>
-            </div>
-
+  return (
+    <div className="bg-green-950/70 border-r border-white/10 h-full overflow-y-auto p-4 w-64 flex flex-col justify-between text-white shrink-0">
+      <div>
+        <div className="flex items-center gap-3 mb-8 px-1">
+          <img src="/logo.png" alt="AgriSense logo" className="w-10 h-10 object-contain" />
+          <div className="flex flex-col">
+            <span className="text-lg font-bold tracking-wide text-gray-100">AgriSense</span>
+            <span className="text-xs text-emerald-200/80">Smart Agriculture</span>
+          </div>
         </div>
-    );
+
+        <div className="flex flex-col gap-2">
+          <button onClick={() => handleNavigation("main")} className={itemClass("main")}>
+            <IoHomeOutline className="text-xl" />
+            Dashboard
+          </button>
+          <button onClick={() => handleNavigation("device")} className={itemClass("device")}>
+            <MdOutlineBugReport className="text-xl" />
+            Devices
+          </button>
+          <button onClick={() => handleNavigation("analytic")} className={itemClass("analytic")}>
+            <MdOutlineAnalytics className="text-xl" />
+            Reports
+          </button>
+          <button onClick={() => handleNavigation("notification")} className={itemClass("notification")}>
+            <IoIosNotificationsOutline className="text-xl" />
+            Notifications
+          </button>
+          <button onClick={() => handleNavigation("setting")} className={itemClass("setting")}>
+            <CiSettings className="text-xl" />
+            Settings
+          </button>
+          <button onClick={() => handleNavigation("help")} className={itemClass("help")}>
+            <IoMdHelpCircleOutline className="text-xl" />
+            Help & Support
+          </button>
+        </div>
+      </div>
+
+      <div className="border-t border-white/10 pt-4 mt-4">
+        <button onClick={() => handleNavigation("profile")} className={itemClass("profile")}>
+          <div className="w-9 h-9 rounded-full bg-emerald-500/30 border border-emerald-400/40 flex items-center justify-center text-sm font-bold">
+            OM
+          </div>
+          <div className="text-sm text-left">
+            <p className="font-medium">Obama M. Victor</p>
+            <p className="text-xs text-emerald-200/70">Admin</p>
+          </div>
+        </button>
+      </div>
+    </div>
+  );
 }

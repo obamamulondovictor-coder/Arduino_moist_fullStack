@@ -1,28 +1,24 @@
-@import url("https://googleapis.com");
 @import "tailwindcss";
 
 @theme {
   --font-roboto: "Roboto", sans-serif;
 }
 
-/* Desktop */
 [data-sileo-viewport] {
-    width: 380px;
-    max-width: calc(100vw - 32px);
+  width: 380px;
+  max-width: calc(100vw - 32px);
 }
 
-/* Tablet */
 @media (max-width: 768px) {
-    [data-sileo-viewport] {
-        width: 340px;
-    }
+  [data-sileo-viewport] {
+    width: 340px;
+  }
 }
 
-/* Mobile */
 @media (max-width: 480px) {
-    [data-sileo-viewport] {
-        width: calc(100vw - 24px);
-        left: 12px !important;
-        right: 12px !important;
-    }
+  [data-sileo-viewport] {
+    width: calc(100vw - 24px);
+    left: 12px !important;
+    right: 12px !important;
+  }
 }
