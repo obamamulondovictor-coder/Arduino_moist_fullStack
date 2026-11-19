@@ -1,5 +1,4 @@
-
-const js = require("@eslint/js");
+﻿const js = require("@eslint/js");
 const globals = require("globals");
 
 module.exports = [
@@ -8,10 +7,10 @@ module.exports = [
   },
   js.configs.recommended,
   {
-    files: ["**/*.js"],
+    files: ["**/*.js", "**/*.mjs"],
     languageOptions: {
       ecmaVersion: "latest",
-      sourceType: "commonjs",
+      sourceType: "module",
       globals: {
         ...globals.node,
       },
@@ -22,9 +21,16 @@ module.exports = [
         {
           argsIgnorePattern: "^_",
           varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
         },
       ],
       "no-console": "off",
+    },
+  },
+  {
+    files: ["**/*.js"],
+    languageOptions: {
+      sourceType: "commonjs",
     },
   },
 ];

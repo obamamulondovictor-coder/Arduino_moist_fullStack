@@ -1,10 +1,10 @@
-const express = require('express');
+﻿const express = require("express");
 const router = express.Router();
-const soilController = require('../Controllers/soildContoller.controller');
-const deviceController = require('../Controllers/device.controller');
+const soilController = require("../Controllers/soildContoller.controller");
 
-
-// POST /soil/status
-router.post('/status', soilController.getSoilStatus);
+router.post("/status", soilController.getSoilStatus);
+router.get("/latest", soilController.getLatest);
+router.get("/readings/:device_id", soilController.getReadings);
+router.get("/alerts", soilController.getAlerts);
 
 module.exports = router;

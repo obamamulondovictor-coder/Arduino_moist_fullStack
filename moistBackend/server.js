@@ -1,42 +1,13 @@
-require("dotenv").config();
+﻿const app = require("./app");
+const { testConnection } = require("./config/db");
 
+const PORT = Number(process.env.PORT) || 3000;
 
-const express  = require("express");
-const app = express()
-const cors = require("cors");
+async function startServer() {
+  await testConnection();
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log("Server is running on port", PORT);
+  });
+}
 
-
-
-app.use(express.json())
-app.use(cors({
-    origin : ""
-}))
-
-//load the routes which is in the controller
-const soilRoute = require("./Routes/soildRoute.route");
-const deviceRoute = require("./Routes/device.route");
-
-app.use("/device" , deviceRoute);
-app.use("/soil" , soilRoute);
-
-
-
-
-
-const PORT = process.env.PORT ?? Number(3000);
-
-app.get("/" , (req , res) => {
-    return res.status(200).json({
-        message : "Soil Moistuer Up And Running",
-        status : "ON"
-    })
-})
-
-
-
-app.listen(PORT , "0.0.0.0" , (error) => {
-    if(error) {
-     throw new Error("Connection error on the server listening" , error)
-    }
-    console.log("Server is hoisted on the network level IP PORT of " ,PORT )
-})
+startServer();

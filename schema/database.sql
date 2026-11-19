@@ -1,18 +1,18 @@
-CREATE TABLE devices (
-  device_id VARCHAR(30) PRIMARY KEY,       -- Uses the MAC address as the unique primary key
+﻿CREATE DATABASE IF NOT EXISTS soilSystemDB;
+USE soilSystemDB;
+
+CREATE TABLE IF NOT EXISTS devices (
+  device_id VARCHAR(30) PRIMARY KEY,
   device_name VARCHAR(100) NOT NULL,
   ip_address VARCHAR(50) DEFAULT NULL,
   operating_mode ENUM('auto', 'manual') DEFAULT 'auto',
-  pump_state ENUM('OFF', 'ON') DEFAULT 'OFF';       -- e.g., "Greenhouse Sector A"
-  location VARCHAR(100),                   -- e.g., "Block 2, Field 3"
+  pump_state ENUM('OFF', 'ON') DEFAULT 'OFF',
+  location VARCHAR(100) DEFAULT NULL,
   status ENUM('active', 'inactive', 'maintenance') DEFAULT 'active',
   registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
-
-
-CREATE TABLE soil_readings (
+CREATE TABLE IF NOT EXISTS soil_readings (
   id INT AUTO_INCREMENT PRIMARY KEY,
   device_id VARCHAR(30) NOT NULL,
   moisture FLOAT NOT NULL,
@@ -22,9 +22,7 @@ CREATE TABLE soil_readings (
   FOREIGN KEY (device_id) REFERENCES devices(device_id) ON DELETE CASCADE
 );
 
-
-
-CREATE TABLE soil_alerts (
+CREATE TABLE IF NOT EXISTS soil_alerts (
   id INT AUTO_INCREMENT PRIMARY KEY,
   device_id VARCHAR(30) NOT NULL,
   moisture_level FLOAT NOT NULL,
