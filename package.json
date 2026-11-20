@@ -1,14 +1,20 @@
-{
+﻿{
   "name": "arduino_moist_fullstack",
   "version": "1.0.0",
-  "description": "This backend will hoist both the back and front managing and saving result to the database of the soil",
+  "description": "Full-stack soil moisture monitoring system",
   "license": "ISC",
-  "author": "OBAMA MULONDO VICTOR & MUHIRWA JUSTIN",
+  "author": "OBAMA MULONDO VICTOR",
   "type": "commonjs",
-  "main": "index.js",
   "scripts": {
-    "test": "node backend/tests/index.js",
-    "dev:backend" : "npx nodemon ./moistBackend/server.js",
-    "dev:frontend" : ""
+    "dev:backend": "npm --prefix moistBackend run dev",
+    "dev:frontend": "npm --prefix moistFrontend run dev",
+    "dev:all": "node scripts/dev-all.js",
+    "build:frontend": "npm --prefix moistFrontend run build",
+    "lint:frontend": "npm --prefix moistFrontend run lint",
+    "lint:backend": "npm --prefix moistBackend run lint",
+    "test:backend": "npm --prefix moistBackend test",
+    "test:frontend": "npm --prefix moistFrontend run lint && npm --prefix moistFrontend run build",
+    "test:all": "npm run test:backend && npm run lint:backend && npm run lint:frontend && npm run build:frontend",
+    "check:all": "npm run test:all"
   }
 }

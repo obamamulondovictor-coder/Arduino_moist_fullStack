@@ -1,5 +1,5 @@
-import React from "react";
-import { Line } from "react-chartjs-2";
+﻿import { Line } from "react-chartjs-2";
+import { useTheme } from "../hooks/useTheme";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,123 +11,138 @@ import {
   Legend,
 } from "chart.js";
 
-// Register the required Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const MoistDataDays = [
-  { id: 1, day: "Mon", SoilMoisture: 90 },
-  { id: 2, day: "Tue", SoilMoisture: 50 },
-  { id: 3, day: "Wed", SoilMoisture: 20 },
-  { id: 4, day: "Thur", SoilMoisture: 5 },
-  { id: 5, day: "Fri", SoilMoisture: 20 },
-  { id: 6, day: "Sat", SoilMoisture: 100 },
-  { id: 7, day: "Sun", SoilMoisture: 93 },
-];
-const MoistDataHour = [
-  { id: 1, hour: '12:00 AM', SoilMoisture: 620 },
-  { id: 2, hour: '1:00 AM', SoilMoisture: 615 },
-  { id: 3, hour: '2:00 AM', SoilMoisture: 610 },
-  { id: 4, hour: '3:00 AM', SoilMoisture: 605 },
-  { id: 5, hour: '4:00 AM', SoilMoisture: 600 },
-  { id: 6, hour: '5:00 AM', SoilMoisture: 595 },
-  { id: 7, hour: '6:00 AM', SoilMoisture: 780 }, // Morning watering spike
-  { id: 8, hour: '7:00 AM', SoilMoisture: 765 },
-  { id: 9, hour: '8:00 AM', SoilMoisture: 750 },
-  { id: 10, hour: '9:00 AM', SoilMoisture: 730 },
-  { id: 11, hour: '10:00 AM', SoilMoisture: 705 },
-  { id: 12, hour: '11:00 AM', SoilMoisture: 680 },
-  { id: 13, hour: '12:00 PM', SoilMoisture: 650 },
-  { id: 14, hour: '1:00 PM', SoilMoisture: 615 },
-  { id: 15, hour: '2:00 PM', SoilMoisture: 580 }, // Afternoon evaporation dip
-  { id: 16, hour: '3:00 PM', SoilMoisture: 550 },
-  { id: 17, hour: '4:00 PM', SoilMoisture: 530 },
-  { id: 18, hour: '5:00 PM', SoilMoisture: 515 },
-  { id: 19, hour: '6:00 PM', SoilMoisture: 505 },
-  { id: 20, hour: '7:00 PM', SoilMoisture: 500 },
-  { id: 21, hour: '8:00 PM', SoilMoisture: 495 },
-  { id: 22, hour: '9:00 PM', SoilMoisture: 490 },
-  { id: 23, hour: '10:00 PM', SoilMoisture: 488 },
-  { id: 24, hour: '11:00 PM', SoilMoisture: 485 },
-];
-const MoistDataMonth = [
-  { id: 1, month: 'Jan', SoilMoisture: 680 },
-  { id: 2, month: 'Feb', SoilMoisture: 710 },
-  { id: 3, month: 'Mar', SoilMoisture: 790 },
-  { id: 4, month: 'Apr', SoilMoisture: 840 },
-  { id: 5, month: 'May', SoilMoisture: 760 },
-  { id: 6, month: 'Jun', SoilMoisture: 520 },
-  { id: 7, month: 'Jul', SoilMoisture: 410 },
-  { id: 8, month: 'Aug', SoilMoisture: 430 },
-  { id: 9, month: 'Sep', SoilMoisture: 610 },
-  { id: 10, month: 'Oct', SoilMoisture: 750 },
-  { id: 11, month: 'Nov', SoilMoisture: 810 },
-  { id: 12, month: 'Dec', SoilMoisture: 730 },
-];
+function toDate(value: string): Date {
+  const d: Date = new Date(value);
+  return d;
+}
 
+function formatHour(value: string): string {
+  const d: Date = toDate(value);
+  if (isNaN(d.getTime())) return value;
+  return d.toLocaleTimeString([], { hour: "numeric" });
+}
 
-//add the prop to pass the active data in the range to mark it as active
+function formatDay(value: string): string {
+  const d: Date = toDate(value);
+  if (isNaN(d.getTime())) return value;
+  return d.toLocaleDateString([], { weekday: "short" });
+}
 
-const LineChart = ({wantedData}: {wantedData :String}) => {
-     let label = null;
-  let chartValues = null;
+function formatMonth(value: string): string {
+  const d: Date = toDate(value);
+  if (isNaN(d.getTime())) return value;
+  return d.toLocaleDateString([], { month: "short" });
+}
 
-  if (wantedData === 'hour') {
-    label = MoistDataHour.map((data) => data.hour);
-    chartValues = MoistDataHour.map((data) => data.SoilMoisture);
+function buildSeries(readings: { moisture: number; created_at: string }[], wantedData: string): { labels: string[]; values: number[] } {
+  const items: { moisture: number; created_at: string }[] = Array.isArray(readings) ? [...readings] : [];
+  items.sort((a: { moisture: number; created_at: string }, b: { moisture: number; created_at: string }) => {
+    return toDate(a.created_at).getTime() - toDate(b.created_at).getTime();
+  });
 
-  } else if (wantedData === 'month') {
-    label = MoistDataMonth.map((data) => data.month);
-    chartValues = MoistDataMonth.map((data) => data.SoilMoisture);
+  if (wantedData === "hour") {
+    const slice: { moisture: number; created_at: string }[] = items.slice(-12);
+    return {
+      labels: slice.map((r: { moisture: number; created_at: string }) => formatHour(r.created_at)),
+      values: slice.map((r: { moisture: number; created_at: string }) => Number(r.moisture || 0)),
+    };
   }
-  else if(wantedData === "days"){
-    label = MoistDataDays.map((data) => data.day);
-    chartValues = MoistDataMonth.map((data) => data.SoilMoisture)
+
+  if (wantedData === "month") {
+    const map: { [key: string]: { label: string; total: number; count: number; time: number } } = {};
+    items.forEach((r: { moisture: number; created_at: string }) => {
+      const d: Date = toDate(r.created_at);
+      if (isNaN(d.getTime())) return;
+      const key: string = d.getFullYear() + "-" + d.getMonth();
+      if (!map[key]) {
+        map[key] = { label: formatMonth(r.created_at), total: 0, count: 0, time: new Date(d.getFullYear(), d.getMonth(), 1).getTime() };
+      }
+      map[key].total += Number(r.moisture || 0);
+      map[key].count += 1;
+    });
+    const groups: { label: string; total: number; count: number; time: number }[] = Object.keys(map).map((k: string) => map[k]);
+    groups.sort((a: { time: number }, b: { time: number }) => a.time - b.time);
+    const slice: { label: string; total: number; count: number }[] = groups.slice(-12);
+    return {
+      labels: slice.map((g: { label: string }) => g.label),
+      values: slice.map((g: { total: number; count: number }) => (g.count ? Math.round((g.total / g.count) * 10) / 10 : 0)),
+    };
   }
+
+  const map: { [key: string]: { label: string; total: number; count: number; time: number } } = {};
+  items.forEach((r: { moisture: number; created_at: string }) => {
+    const d: Date = toDate(r.created_at);
+    if (isNaN(d.getTime())) return;
+    const key: string = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+    if (!map[key]) {
+      map[key] = { label: formatDay(r.created_at), total: 0, count: 0, time: new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() };
+    }
+    map[key].total += Number(r.moisture || 0);
+    map[key].count += 1;
+  });
+  const groups: { label: string; total: number; count: number; time: number }[] = Object.keys(map).map((k: string) => map[k]);
+  groups.sort((a: { time: number }, b: { time: number }) => a.time - b.time);
+  const slice: { label: string; total: number; count: number }[] = groups.slice(-7);
+  return {
+    labels: slice.map((g: { label: string }) => g.label),
+    values: slice.map((g: { total: number; count: number }) => (g.count ? Math.round((g.total / g.count) * 10) / 10 : 0)),
+  };
+}
+
+export default function LineChart({ wantedData, readings }: { wantedData: string; readings?: { moisture: number; created_at: string }[] }) {
+  const series: { labels: string[]; values: number[] } = buildSeries(readings || [], wantedData);
+  const hasData: boolean = series.values.length > 0;
+  const { isDark } = useTheme();
+  const textColor: string = isDark ? "#e8f3ea" : "#475569";
+  const gridColor: string = isDark ? "rgba(255,255,255,0.08)" : "rgba(15,60,30,0.08)";
+  const pointBackgroundColor: string = isDark ? "#0b1f12" : "#ecfdf5";
 
   const data = {
-    labels: label,
+    labels: hasData ? series.labels : ["No data"],
     datasets: [
       {
-        label: "Soil Moisture Trends",
-        data: chartValues,
-        tension: 0.5, // Updated from lineTension
-        backgroundColor: "#9F7AEA",
-        borderColor: "#9F7AEA",
-        pointBorderColor: "#B57295",
-        pointBackgroundColor: "#fff",
-        pointBorderWidth: 1,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: "#D6BCFA",
-        pointHoverBorderColor: "#D6BCFA",
+        label: "Soil Moisture (%)",
+        data: hasData ? series.values : [0],
+        tension: 0.4,
+        borderColor: "#10b981",
+        backgroundColor: "rgba(16, 185, 129, 0.2)",
+        pointBackgroundColor,
+        pointBorderColor: "#10b981",
+        pointBorderWidth: 2,
         pointRadius: 3,
+        fill: true,
       },
     ],
   };
 
   const option = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "top",
+        position: "top" as const,
+        labels: {
+          color: textColor,
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: { color: textColor },
+        grid: { color: gridColor },
+      },
+      y: {
+        ticks: { color: textColor },
+        grid: { color: gridColor },
       },
     },
   };
 
   return (
-    <div style={{ width: "100%", maxWidth: "700px", margin: "0 auto" }}>
-      <h1 style={{ color: "#805AD5" }}>Soild Trending Chart</h1>
+    <div className="w-full h-72 md:h-80">
       <Line data={data} options={option} />
-      
     </div>
   );
-};
-
-export default LineChart;
+}

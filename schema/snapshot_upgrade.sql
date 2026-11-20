@@ -1,0 +1,34 @@
+USE soilSystemDB;
+
+ALTER TABLE devices
+  ADD COLUMN firmware_version VARCHAR(50) DEFAULT NULL,
+  ADD COLUMN last_seen DATETIME DEFAULT NULL,
+  ADD COLUMN cooldown_until DATETIME DEFAULT NULL,
+  ADD COLUMN fault VARCHAR(50) DEFAULT NULL,
+  ADD COLUMN fault_at DATETIME DEFAULT NULL,
+  ADD COLUMN control_reason VARCHAR(255) DEFAULT NULL;
+
+ALTER TABLE soil_readings
+  ADD COLUMN tank_level FLOAT DEFAULT NULL,
+  ADD COLUMN air_humidity FLOAT DEFAULT NULL,
+  ADD COLUMN signal_strength FLOAT DEFAULT NULL,
+  ADD COLUMN sensor_valid TINYINT(1) NOT NULL DEFAULT 1,
+  ADD COLUMN pump_state VARCHAR(10) DEFAULT NULL,
+  ADD COLUMN pump_started_at DATETIME DEFAULT NULL,
+  ADD COLUMN control_reason VARCHAR(255) DEFAULT NULL,
+  ADD COLUMN firmware_version VARCHAR(50) DEFAULT NULL;
+
+CREATE TABLE IF NOT EXISTS irrigation_settings (
+  device_id VARCHAR(30) NOT NULL,
+  start_threshold FLOAT NOT NULL DEFAULT 30,
+  stop_threshold FLOAT NOT NULL DEFAULT 45,
+  max_runtime_seconds INT NOT NULL DEFAULT 90,
+  cooldown_seconds INT NOT NULL DEFAULT 60,
+  min_tank_level FLOAT NOT NULL DEFAULT 12,
+  stale_after_seconds INT NOT NULL DEFAULT 30,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (device_id),
+  FOREIGN KEY (device_id) REFERENCES devices(device_id) ON DELETE CASCADE
+);
+
+INSERT IGNORE INTO irrigation_settings (device_id) SELECT device_id FROM devices;

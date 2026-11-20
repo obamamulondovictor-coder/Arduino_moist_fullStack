@@ -5,15 +5,11 @@ import "../styles/landing.style.css";
 import { Link } from "react-router";
 import { FaArrowRight, FaPhoneAlt } from "react-icons/fa";
 import { sileo, Toaster } from "sileo";
-import TourGuide from "./tourGuide"
-
-type ToastPosition = "bottom-left" | "top-center" | "bottom-center" | "bottom-right";
 
 export default function LandingPage() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  const [deskTopPos, setDeskTopPos] = useState<ToastPosition>("bottom-left");
-  const [tourButton , setTourButton] = useState(false);
-  const [toastOpen , setToastOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 640);
+  const [deskTopPos, setDeskTopPos] = useState<"bottom-left" | "top-center" | "bottom-center" | "bottom-right">("bottom-left");
+  const [tourButton, setTourButton] = useState<boolean>(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -31,30 +27,29 @@ export default function LandingPage() {
   } , [])
 
   function handleProjectInfoClick() {
-    const targetPos: ToastPosition = isMobile ? "top-center" : "bottom-right";
+    const targetPos: "bottom-left" | "top-center" | "bottom-center" | "bottom-right" = isMobile ? "top-center" : "bottom-right";
     setDeskTopPos(targetPos);
 
-    const mode = localStorage.getItem("theme") || "white";
+    const mode: string = localStorage.getItem("theme") || "white";
 
     sileo.info({
       title: "Project In Progress",
       description:
-        "This is the system of the smart irrigation with soil moisture sensor project. The project is still in progress and will be updated soon.",
+        "Smart irrigation and soil moisture monitoring system. Static demo pages are ready for further integration.",
       position: targetPos,
       fill: mode === "dark" ? "#0f172a" : "#ffffff",
       styles: {
         title: mode === "dark" ? "text-white!" : "text-gray-900!",
         description: mode === "dark" ? "text-white/75! break-words!" : "text-gray-600! break-words!",
-        // container: "w-[92vw]! max-w-[400px]! mx-auto!",
       },
     });
   }
 
   function handleContactSupportClick() {
-    const targetPos: ToastPosition = "top-center";
+    const targetPos: "bottom-left" | "top-center" | "bottom-center" | "bottom-right" = "top-center";
     setDeskTopPos(targetPos);
 
-    const mode = localStorage.getItem("theme") || "white";
+    const mode: string = localStorage.getItem("theme") || "white";
 
     sileo.success({
       title: "Contact Information",
@@ -66,7 +61,7 @@ export default function LandingPage() {
         // container: "w-[92vw]! max-w-[400px]! mx-auto!",
       },
       description: (
-        <span className="text-emerald-600 dark:text-emerald-400 font-medium wrap-brak">
+        <span className="text-emerald-600 dark:text-emerald-400 font-medium break-words">
           For support, please contact us at: <br />
           <a
             href="mailto:obamamulondo6@gmail.com"

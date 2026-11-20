@@ -12,6 +12,7 @@
   "dependencies": {
     "chart.js": "^4.6.1",
     "driver.js": "^1.14.0",
+    "lucide-react": "^1.76.0",
     "react": "^19.3.1",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.3.1",
