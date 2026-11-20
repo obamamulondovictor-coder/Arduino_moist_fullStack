@@ -1,20 +1,22 @@
-import { useState } from "react";
+﻿import { useState } from "react";
+import { getApiBaseUrl } from "../../services/api";
 
 export default function SettingPage() {
   const [autoMode, setAutoMode] = useState<boolean>(true);
   const [emailAlert, setEmailAlert] = useState<boolean>(true);
   const [smsAlert, setSmsAlert] = useState<boolean>(false);
   const [threshold, setThreshold] = useState<string>("30");
+  const apiBase: string = getApiBaseUrl();
 
   return (
-    <div className="w-full text-white">
+    <div className="w-full text-[var(--text)]">
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold">Settings</h1>
-        <p className="text-sm text-emerald-100/70 mt-1">Configure irrigation preferences and alert behavior (static UI).</p>
+        <p className="text-sm text-[var(--text-muted)] mt-1">Configure irrigation preferences and alert behavior.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white/10 border border-white/15 rounded-xl p-5">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm p-5">
           <h2 className="text-lg font-semibold mb-4">Irrigation</h2>
           <div className="space-y-4 text-sm">
             <label className="flex items-center justify-between gap-4">
@@ -27,14 +29,14 @@ export default function SettingPage() {
                 type="number"
                 value={threshold}
                 onChange={(e) => setThreshold(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/15 focus:outline-none focus:border-emerald-400"
+                className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] focus:outline-none focus:border-emerald-400"
               />
             </label>
-            <p className="text-xs text-emerald-100/60">Pump triggers when moisture falls below threshold in auto mode.</p>
+            <p className="text-xs text-[var(--text-soft)]">Pump triggers when moisture falls below threshold in auto mode.</p>
           </div>
         </div>
 
-        <div className="bg-white/10 border border-white/15 rounded-xl p-5">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm p-5">
           <h2 className="text-lg font-semibold mb-4">Notifications</h2>
           <div className="space-y-4 text-sm">
             <label className="flex items-center justify-between gap-4">
@@ -47,18 +49,18 @@ export default function SettingPage() {
             </label>
             <label className="block">
               <span className="block mb-2">Alert email</span>
-              <input type="email" value="admin@agrisense.local" readOnly className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/15 text-emerald-100/80" />
+              <input type="email" value="admin@agrisense.local" readOnly className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)]" />
             </label>
           </div>
         </div>
       </div>
 
-      <div className="mt-4 bg-white/10 border border-white/15 rounded-xl p-5">
+      <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm p-5">
         <h2 className="text-lg font-semibold mb-2">System Info</h2>
-        <div className="text-sm text-emerald-100/75 space-y-1">
-          <p>Backend: http://localhost:3000 (not connected in static mode)</p>
-          <p>Database: soil_monitoring_db</p>
-          <p>Version: 0.1.0 (frontend demo)</p>
+        <div className="text-sm text-[var(--text-muted)] space-y-1">
+          <p>Backend: {apiBase} (connected via API, auto-refresh on dashboard)</p>
+          <p>Database: soilSystemDB</p>
+          <p>Version: 0.1.0</p>
         </div>
       </div>
     </div>

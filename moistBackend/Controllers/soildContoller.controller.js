@@ -1,4 +1,6 @@
 ﻿const soilService = require("../Service/soilService.service");
+const snapshotService = require("../Service/snapshot.service");
+const realtime = require("../Service/realtime.service");
 
 async function getSoilStatus(req, res) {
   try {
@@ -32,6 +34,13 @@ async function getSoilStatus(req, res) {
       pump_state: body.pump_state,
       location: body.location,
       status: body.status,
+      tank_level: body.tank_level,
+      air_humidity: body.air_humidity,
+      signal_strength: body.signal_strength,
+      sensor_valid: body.sensor_valid,
+      pump_started_at: body.pump_started_at,
+      control_reason: body.control_reason,
+      firmware_version: body.firmware_version,
     });
 
     return res.status(201).json({
@@ -97,9 +106,34 @@ async function getAlerts(req, res) {
   }
 }
 
+async function getSnapshot(req, res) {
+  try {
+    const snapshot = await snapshotService.getSnapshot(req.params.device_id);
+    if (!snapshot) {
+      return res.status(404).json({
+        success: false,
+        message: "Device is not registered yet",
+      });
+    }
+    return res.status(200).json({ success: true, data: snapshot });
+  } catch (error) {
+    console.error("getSnapshot error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to load device snapshot",
+    });
+  }
+}
+
+function streamSnapshot(req, res) {
+  return realtime.subscribe(req.params.device_id, res);
+}
+
 module.exports = {
   getSoilStatus,
   getLatest,
   getReadings,
   getAlerts,
+  getSnapshot,
+  streamSnapshot,
 };

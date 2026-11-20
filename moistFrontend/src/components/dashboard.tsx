@@ -33,15 +33,25 @@ export default function Dashboard({ initialPage }: { initialPage: string }) {
 
   return (
     <div
-      className="relative w-full h-screen bg-cover bg-center flex items-center justify-center p-3 md:p-4 overflow-hidden"
+      className="relative flex w-full min-h-screen items-center justify-center overflow-hidden bg-cover bg-center p-3 md:p-4"
       style={{ backgroundImage: "url('/greens.png')" }}
     >
-      <div className="absolute inset-0 bg-emerald-950/55 backdrop-blur-[3px]"></div>
+      <div
+        className="absolute inset-0 transition-colors duration-300"
+        style={{ background: "var(--app-veil)" }}
+      />
 
-      <div className="relative z-10 w-full h-full max-w-7xl max-h-[92vh] flex overflow-hidden rounded-[24px] bg-white/[0.04] backdrop-blur-[40px] border border-white/20 shadow-[0_16px_40px_rgba(0,0,0,0.35)]">
+      <div
+        className="relative z-10 flex h-full max-h-[92vh] w-full max-w-7xl overflow-hidden rounded-[24px] backdrop-blur-[18px] transition-colors duration-300"
+        style={{
+          background: "var(--shell-bg)",
+          border: "1px solid var(--shell-border)",
+          boxShadow: "var(--shell-shadow)",
+        }}
+      >
         <LeftNavbar activePage={activePage} setActivePage={setActivePage} />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 text-white">
+        <main className="relative flex-1 overflow-y-auto p-4 md:p-6 text-[var(--text)] transition-colors duration-300">
           {renderPage()}
         </main>
       </div>

@@ -1,9 +1,9 @@
 import { IoHomeOutline } from "react-icons/io5";
-import { MdOutlineBugReport } from "react-icons/md";
-import { MdOutlineAnalytics } from "react-icons/md";
-import { IoIosNotificationsOutline } from "react-icons/io";
-import { IoMdHelpCircleOutline } from "react-icons/io";
+import { MdOutlineBugReport, MdOutlineAnalytics } from "react-icons/md";
+import { IoIosNotificationsOutline, IoMdHelpCircleOutline } from "react-icons/io";
 import { CiSettings } from "react-icons/ci";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "../hooks/useTheme";
 import "../styles/leftNav.style.css";
 
 export default function LeftNavbar({
@@ -13,6 +13,8 @@ export default function LeftNavbar({
   activePage: string;
   setActivePage: (page: string) => void;
 }) {
+  const { isDark, toggleTheme } = useTheme();
+
   const handleNavigation = (page: string) => {
     setActivePage(page);
   };
@@ -25,10 +27,13 @@ export default function LeftNavbar({
   };
 
   return (
-    <div className="bg-green-950/70 border-r border-white/10 h-full overflow-y-auto p-4 w-64 flex flex-col justify-between text-white shrink-0">
+    <div
+      className="h-full w-64 shrink-0 overflow-y-auto overflow-x-hidden border-r p-4 text-white transition-colors duration-300"
+      style={{ background: "var(--nav-bg)", borderColor: "var(--nav-border)" }}
+    >
       <div>
-        <div className="flex items-center gap-3 mb-8 px-1">
-          <img src="/logo.png" alt="AgriSense logo" className="w-10 h-10 object-contain" />
+        <div className="mb-8 flex items-center gap-3 px-1">
+          <img src="/logo.png" alt="AgriSense logo" className="h-10 w-10 object-contain" />
           <div className="flex flex-col">
             <span className="text-lg font-bold tracking-wide text-gray-100">AgriSense</span>
             <span className="text-xs text-emerald-200/80">Smart Agriculture</span>
@@ -63,12 +68,22 @@ export default function LeftNavbar({
         </div>
       </div>
 
-      <div className="border-t border-white/10 pt-4 mt-4">
+      <div className="mt-4 border-t pt-4" style={{ borderColor: "var(--nav-border)" }}>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="mb-2 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-left text-sm text-slate-200 transition hover:bg-white/10"
+          aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+        >
+          {isDark ? <Sun className="text-lg text-amber-300" /> : <Moon className="text-lg text-emerald-300" />}
+          <span>{isDark ? "Light theme" : "Dark theme"}</span>
+        </button>
+
         <button onClick={() => handleNavigation("profile")} className={itemClass("profile")}>
-          <div className="w-9 h-9 rounded-full bg-emerald-500/30 border border-emerald-400/40 flex items-center justify-center text-sm font-bold">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/30 text-sm font-bold">
             OM
           </div>
-          <div className="text-sm text-left">
+          <div className="text-left text-sm">
             <p className="font-medium">Obama M. Victor</p>
             <p className="text-xs text-emerald-200/70">Admin</p>
           </div>

@@ -1,39 +1,76 @@
+﻿import { useEffect, useState } from "react";
+import { fetchAlerts } from "../../services/api";
+
 export default function NotificationPage() {
-  const alerts: { id: number; title: string; message: string; time: string; level: string }[] = [
-    { id: 1, title: "Low Moisture", message: "Nursery Node C moisture dropped below 35%.", time: "2 min ago", level: "warning" },
-    { id: 2, title: "Device Online", message: "ESP32-001 reconnected successfully.", time: "10 min ago", level: "success" },
-    { id: 3, title: "Pump Activated", message: "Field Node B pump turned ON (auto mode).", time: "25 min ago", level: "info" },
-    { id: 4, title: "Scheduled Check", message: "Daily sensor health check completed.", time: "1 hr ago", level: "info" },
-  ];
+  const [alerts, setAlerts] = useState<{ id: number; device_id: string; device_name: string | null; moisture_level: number; alert_message: string; created_at: string }[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    let cancelled: boolean = false;
+    const load = async (): Promise<void> => {
+      try {
+        const data = await fetchAlerts(50);
+        if (cancelled) return;
+        setAlerts(data);
+        setError("");
+      } catch {
+        if (!cancelled) setError("Unable to load alerts from backend");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    const start: number = window.setTimeout(() => { void load(); }, 0);
+    const timer: number = window.setInterval(() => { void load(); }, 5000);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(start);
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  const levelFor = (moisture: number): string => {
+    if (Number(moisture) < 20) return "critical";
+    if (Number(moisture) < 30) return "warning";
+    return "info";
+  };
 
   const levelClass = (level: string): string => {
-    if (level === "warning") return "bg-orange-500/20 text-orange-300 border-orange-400/30";
-    if (level === "success") return "bg-emerald-500/20 text-emerald-300 border-emerald-400/30";
-    return "bg-sky-500/20 text-sky-300 border-sky-400/30";
+    if (level === "critical") return "bg-[var(--danger-soft)] text-[var(--danger)] border-[var(--danger-border)]";
+    if (level === "warning") return "bg-[var(--warning-soft)] text-[var(--warning)] border-[var(--warning-border)]";
+    return "bg-[var(--info-soft)] text-[var(--info)] border-[var(--info-border)]";
   };
 
   return (
-    <div className="w-full text-white">
+    <div className="w-full text-[var(--text)]">
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold">Notifications</h1>
-        <p className="text-sm text-emerald-100/70 mt-1">Recent system alerts and activity updates (static).</p>
+        <p className="text-sm text-[var(--text-muted)] mt-1">Real-time soil alerts from backend (auto-refresh 5s).</p>
       </div>
 
-      <div className="bg-white/10 border border-white/15 rounded-xl p-4 md:p-5">
-        <div className="space-y-3">
-          {alerts.map((alert: { id: number; title: string; message: string; time: string; level: string }) => (
-            <div key={alert.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg bg-white/5 border border-white/10">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={"text-xs px-2 py-0.5 rounded-full border " + levelClass(alert.level)}>{alert.level}</span>
-                  <h2 className="font-semibold">{alert.title}</h2>
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm p-4 md:p-5">
+        {error ? <p className="text-sm text-[var(--danger)] mb-3">{error}</p> : null}
+        {loading ? <p className="text-sm text-[var(--text-muted)]">Loading alerts...</p> : null}
+        {!loading && alerts.length === 0 ? <p className="text-sm text-[var(--text-muted)]">No alerts yet.</p> : null}
+        {alerts.length > 0 ? (
+          <div className="space-y-3">
+            {alerts.map((alert: { id: number; device_id: string; device_name: string | null; moisture_level: number; alert_message: string; created_at: string }) => {
+              const level: string = levelFor(alert.moisture_level);
+              return (
+                <div key={alert.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg border border-[var(--border)] bg-[var(--surface-soft)]">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={"text-xs px-2 py-0.5 rounded-full border " + levelClass(level)}>{level}</span>
+                      <h2 className="font-semibold">Low Moisture - {alert.device_name || alert.device_id}</h2>
+                    </div>
+                    <p className="text-sm text-[var(--text-muted)]">{alert.alert_message} (moisture: {Number(alert.moisture_level).toFixed(1)}%)</p>
+                  </div>
+                  <span className="text-xs text-[var(--text-soft)]">{new Date(alert.created_at).toLocaleString()}</span>
                 </div>
-                <p className="text-sm text-emerald-100/75">{alert.message}</p>
-              </div>
-              <span className="text-xs text-emerald-100/60">{alert.time}</span>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        ) : null}
       </div>
     </div>
   );

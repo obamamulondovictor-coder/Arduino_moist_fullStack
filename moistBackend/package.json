@@ -1,11 +1,11 @@
-{
+﻿{
   "name": "moistbackend",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
     "test": "vitest run",
-    "dev": "npx nodemon ./moistBackend/server.js",
+    "dev": "nodemon server.js",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
