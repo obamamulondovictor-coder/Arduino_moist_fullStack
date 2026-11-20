@@ -1,4 +1,7 @@
 ﻿const deviceService = require("../Service/device.service");
+const mqttService = require("../Service/mqtt.service");
+const realtime = require("../Service/realtime.service");
+
 
 async function recordDeviceDetails(req, res) {
   try {
@@ -154,6 +157,58 @@ async function changeDeviceMode(req, res) {
   }
 }
 
+function streamDevice(req, res) {
+  return realtime.subscribe(
+    req.params.device_id,
+    res,
+    req.headers["last-event-id"],
+  );
+}
+
+async function setDeviceStatus(req, res) {
+  try {
+    const deviceId = String(req.params.device_id || "").trim();
+    const body = req.body || {};
+    const rawState = body.state ?? body.pump ?? body.pump_state ?? body.pumpState;
+    const state = rawState === undefined ? "" : String(rawState).trim().toUpperCase();
+    const mode = body.mode ? String(body.mode).trim().toUpperCase() : "";
+
+    if (!deviceId) {
+      return res.status(400).json({ success: false, message: "device_id is required" });
+    }
+    if (state !== "ON" && state !== "OFF" && mode !== "AUTO" && mode !== "MANUAL") {
+      return res.status(400).json({
+        success: false,
+        message: "Provide state as ON/OFF or mode as AUTO/MANUAL",
+      });
+    }
+
+    const device = await deviceService.getDeviceById(deviceId);
+    if (!device) {
+      return res.status(404).json({ success: false, message: "Device not found" });
+    }
+
+    const command = state
+      ? { action: "relay", state }
+      : { action: "mode", mode };
+    const cmdId = await mqttService.publishCommand(deviceId, command);
+
+    return res.status(202).json({
+      success: true,
+      message: "Command queued",
+      cmdId,
+      device_id: deviceId,
+      ...command,
+    });
+  } catch (error) {
+    console.error("setDeviceStatus error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to queue device command",
+    });
+  }
+}
+
 module.exports = {
   recordDeviceDetails,
   getDevices,
@@ -161,4 +216,6 @@ module.exports = {
   updateDevice,
   deleteDevice,
   changeDeviceMode,
+  streamDevice,
+  setDeviceStatus,
 };

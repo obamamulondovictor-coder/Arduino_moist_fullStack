@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { DeviceSnapshot, IrrigationSettings } from "../types.ts";
-import { fetchDevices, fetchSnapshot, subscribeToSnapshot } from "../services/api.ts";
+import {
+  fetchDevices,
+  fetchSnapshot,
+  subscribeToDeviceEvents,
+  type DeviceStreamEvent,
+} from "../services/api.ts";
 
 export interface BackendDevice {
   device_id: string;
@@ -58,6 +63,8 @@ export function useDeviceSnapshot() {
   const [snapshot, setSnapshot] = useState<DeviceSnapshot>(() => emptySnapshot(""));
   const [now, setNow] = useState(() => Date.now());
   const [connected, setConnected] = useState(false);
+  const [lastEvent, setLastEvent] = useState<DeviceStreamEvent | null>(null);
+  const refreshRef = useRef<() => void>(() => {});
 
   const deviceId = selectedId || devices[0]?.device_id || "";
   const visibleSnapshot =
@@ -113,8 +120,12 @@ export function useDeviceSnapshot() {
       }
     };
 
+    refreshRef.current = refresh;
     void refresh();
-    const unsubscribe = subscribeToSnapshot(deviceId, () => { void refresh(); });
+    const unsubscribe = subscribeToDeviceEvents(deviceId, (event) => {
+      setLastEvent(event);
+      void refresh();
+    });
     const timer = window.setInterval(() => { void refresh(); }, 5000);
     window.addEventListener("online", refresh);
 
@@ -126,6 +137,10 @@ export function useDeviceSnapshot() {
     };
   }, [deviceId]);
 
+  const refreshSnapshot = useCallback(() => {
+    refreshRef.current();
+  }, []);
+
   return {
     devices,
     deviceId,
@@ -133,5 +148,7 @@ export function useDeviceSnapshot() {
     snapshot: visibleSnapshot,
     now,
     connected,
+    lastEvent,
+    refreshSnapshot,
   };
 }

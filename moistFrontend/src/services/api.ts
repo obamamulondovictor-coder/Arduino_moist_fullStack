@@ -52,21 +52,82 @@ export async function fetchSnapshot(deviceId: string): Promise<DeviceSnapshot> {
   return data.data;
 }
 
-export function subscribeToSnapshot(
+export interface DeviceCommandResult {
+  success: boolean;
+  cmdId: string;
+  device_id: string;
+  action: string;
+  state: string | null;
+}
+
+export interface DeviceStreamEvent {
+  type: "ready" | "update" | "telemetry" | "status" | "command" | "ack";
+  payload: Record<string, unknown>;
+}
+
+async function postRequest(path: string, body: unknown): Promise<unknown> {
+  const response = await fetch(baseUrl + path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    throw new Error("Request failed: " + response.status);
+  }
+  return await response.json();
+}
+
+export async function sendDeviceCommand(
   deviceId: string,
-  onUpdate: () => void,
+  command: { state?: "ON" | "OFF"; mode?: "AUTO" | "MANUAL" },
+): Promise<DeviceCommandResult> {
+  const data = (await postRequest(
+    "/device/status/" + encodeURIComponent(deviceId),
+    command,
+  )) as DeviceCommandResult & { success?: boolean };
+  if (!data.success || !data.cmdId) throw new Error("Command was not accepted");
+  return data;
+}
+
+export async function setPumpState(
+  deviceId: string,
+  state: "ON" | "OFF",
+): Promise<DeviceCommandResult> {
+  return await sendDeviceCommand(deviceId, { state });
+}
+
+export function subscribeToDeviceEvents(
+  deviceId: string,
+  onEvent: (event: DeviceStreamEvent) => void,
 ): () => void {
   if (typeof EventSource === "undefined") return () => {};
 
   let cancelled = false;
   let retryTimer: number | undefined;
   let stream: EventSource | null = null;
+  const types: DeviceStreamEvent["type"][] = [
+    "ready",
+    "update",
+    "telemetry",
+    "status",
+    "command",
+    "ack",
+  ];
 
   const connect = () => {
     if (cancelled) return;
-    stream = new EventSource(baseUrl + "/soil/stream/" + encodeURIComponent(deviceId));
-    stream.addEventListener("ready", onUpdate);
-    stream.addEventListener("update", onUpdate);
+    stream = new EventSource(baseUrl + "/device/stream/" + encodeURIComponent(deviceId));
+    for (const type of types) {
+      stream.addEventListener(type, (message) => {
+        let payload: Record<string, unknown>;
+        try {
+          payload = JSON.parse((message as MessageEvent).data) as Record<string, unknown>;
+        } catch {
+          payload = {};
+        }
+        onEvent({ type, payload });
+      });
+    }
     stream.addEventListener("error", () => {
       stream?.close();
       stream = null;
@@ -83,4 +144,11 @@ export function subscribeToSnapshot(
     stream?.close();
     stream = null;
   };
+}
+
+export function subscribeToSnapshot(
+  deviceId: string,
+  onUpdate: () => void,
+): () => void {
+  return subscribeToDeviceEvents(deviceId, () => onUpdate());
 }

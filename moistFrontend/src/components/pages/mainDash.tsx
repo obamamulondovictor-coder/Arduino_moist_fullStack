@@ -9,14 +9,16 @@ import LineChart from "../chartComp";
 import { MetricCards } from "../MetricCards";
 import { useDeviceSnapshot } from "../../hooks/useDeviceSnapshot";
 import { useTheme } from "../../hooks/useTheme";
-import { fetchHealth, fetchLatestReadings, fetchAlerts, fetchReadings } from "../../services/api";
+import { fetchHealth, fetchLatestReadings, fetchAlerts, fetchReadings, setPumpState } from "../../services/api";
 
 export default function MainDash() {
   const [isOnline, setIsOnline] = useState<boolean>(false);
   const [wantedData, setWantedData] = useState<string>("days");
   const [searchValue, setSearchValue] = useState<string>("");
-  const { devices, deviceId, snapshot, now } = useDeviceSnapshot();
+  const { devices, deviceId, snapshot, now, lastEvent, refreshSnapshot } = useDeviceSnapshot();
   const { isDark, toggleTheme } = useTheme();
+  const [commandPending, setCommandPending] = useState<boolean>(false);
+  const [commandMessage, setCommandMessage] = useState<string>("");
   const [latest, setLatest] = useState<{ id: number; device_id: string; device_name: string | null; moisture: number; temperature: number; mode: string; created_at: string }[]>([]);
   const [alerts, setAlerts] = useState<{ id: number; device_id: string; device_name: string | null; moisture_level: number; alert_message: string; created_at: string }[]>([]);
   const [chartReadings, setChartReadings] = useState<{ id: number; device_id: string; moisture: number; temperature: number; mode: string; created_at: string }[]>([]);
@@ -25,6 +27,21 @@ export default function MainDash() {
   const handleWantedData = (data: string) => {
     setWantedData(data);
   };
+
+  const handlePumpCommand = async (state: "ON" | "OFF") => {
+    if (!deviceId || commandPending) return;
+    setCommandPending(true);
+    setCommandMessage(`Sending ${state} command...`);
+    try {
+      await setPumpState(deviceId, state);
+      refreshSnapshot();
+    } catch (error) {
+      setCommandMessage(error instanceof Error ? error.message : "Command failed");
+    } finally {
+      setCommandPending(false);
+    }
+  };
+
 
 
   useEffect(() => {
@@ -60,6 +77,19 @@ export default function MainDash() {
       clearTimeout(timer);
     };
   }, [searchValue]);
+
+  const streamMessage = (() => {
+    if (!lastEvent) return "";
+    if (lastEvent.type === "ack") {
+      const ok = lastEvent.payload.ok === true;
+      const message = String(lastEvent.payload.message || "");
+      return ok ? "Pump command confirmed by device" : message || "Pump command failed";
+    }
+    if (lastEvent.type === "status") {
+      return lastEvent.payload.online ? "Device online" : "Device offline";
+    }
+    return "";
+  })();
 
   useEffect(() => {
     let cancelled: boolean = false;
@@ -211,7 +241,17 @@ export default function MainDash() {
             </p>
           </div>
 
-          <MetricCards snapshot={snapshot} now={now} />
+          <MetricCards
+            snapshot={snapshot}
+            now={now}
+            onPumpCommand={(state) => { void handlePumpCommand(state); }}
+            commandPending={commandPending}
+          />
+          {commandMessage || streamMessage ? (
+            <p className="mt-2 text-xs text-[var(--text-muted)]">
+              {commandMessage || streamMessage}
+            </p>
+          ) : null}
         </div>
 
         <div className="bg-white dark:bg-green-950/40 border border-gray-200 dark:border-white/10 rounded-2xl p-5 shadow-sm mb-7">

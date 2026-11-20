@@ -373,6 +373,41 @@
   animation: mc-pump-pulse 1.8s ease-in-out infinite;
 }
 
+.metric-grid .pump-controls {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.metric-grid .pump-controls button {
+  flex: 1;
+  padding: 5px 8px;
+  color: var(--mc-text-muted);
+  background: var(--mc-surface-soft);
+  border: 1px solid var(--mc-border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.metric-grid .pump-controls button:hover:not(:disabled) {
+  color: var(--mc-green);
+  border-color: var(--mc-green);
+}
+
+.metric-grid .pump-controls button.is-active {
+  color: var(--mc-green);
+  background: var(--mc-green-soft);
+  border-color: var(--mc-green);
+}
+
+.metric-grid .pump-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .metric-grid .runtime-track {
   height: 4px;
   margin-top: 10px;

@@ -126,7 +126,11 @@ async function getSnapshot(req, res) {
 }
 
 function streamSnapshot(req, res) {
-  return realtime.subscribe(req.params.device_id, res);
+  return realtime.subscribe(
+    req.params.device_id,
+    res,
+    req.headers["last-event-id"],
+  );
 }
 
 module.exports = {

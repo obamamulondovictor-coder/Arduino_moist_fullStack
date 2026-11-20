@@ -1,5 +1,7 @@
 ./moistBackend/node_modules
 ./moistBackend/.env
+ESP32_WROOM/.pio/
+ESP32_WROOM/src/*.ino.cpp
 
 ./moistFrontend/node_modules
 moistBackend/node_modules/.package-lock.json

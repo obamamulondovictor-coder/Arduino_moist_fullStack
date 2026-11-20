@@ -23,6 +23,8 @@ import '../styles/metric-cards.css'
 interface MetricCardsProps {
   snapshot: DeviceSnapshot
   now: number
+  onPumpCommand?: (state: 'ON' | 'OFF') => void
+  commandPending?: boolean
 }
 
 function getMoistureStatus(value: number | null, start: number, stop: number) {
@@ -54,7 +56,7 @@ function moistureDelta(snapshot: DeviceSnapshot): number | null {
   return latest - previous
 }
 
-export function MetricCards({ snapshot, now }: MetricCardsProps) {
+export function MetricCards({ snapshot, now, onPumpCommand, commandPending = false }: MetricCardsProps) {
   const { telemetry, settings } = snapshot
   const hasReading =
     telemetry.soilMoisture !== null ||
@@ -241,6 +243,26 @@ export function MetricCards({ snapshot, now }: MetricCardsProps) {
             <div className="runtime-track" aria-hidden="true">
               <span style={{ width: `${runtimeProgress}%` }} />
             </div>
+            {onPumpCommand ? (
+              <div className="pump-controls">
+                <button
+                  type="button"
+                  className={snapshot.pumpStatus === 'ON' ? 'is-active' : ''}
+                  disabled={commandPending || snapshot.pumpStatus === 'ON'}
+                  onClick={() => onPumpCommand('ON')}
+                >
+                  Turn ON
+                </button>
+                <button
+                  type="button"
+                  className={snapshot.pumpStatus === 'OFF' ? 'is-active' : ''}
+                  disabled={commandPending || snapshot.pumpStatus === 'OFF'}
+                  onClick={() => onPumpCommand('OFF')}
+                >
+                  Turn OFF
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
 
