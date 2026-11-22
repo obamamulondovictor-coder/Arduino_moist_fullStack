@@ -1,111 +1,221 @@
-const db = require("../config/db");
-const Device = require("../Service/device.service")
-async function recordDeviceDetails(req , res) {
-    try {
+﻿const deviceService = require("../Service/device.service");
+const mqttService = require("../Service/mqtt.service");
+const realtime = require("../Service/realtime.service");
 
-        const {device_id , device_name , ip_address , operating_mode , pump_state , location } = req.body;
 
-        if(!device_id || !device_name || !ip_address || !operating_mode || !pump_state || !location) {
-            return res.status(400).json({
-                message : "Invalid Data Sent",
-                validity : Boolean(false)
-            })
-        }
-
-        //save the device 
-
-        const saveDevice = Device.recordDevice({device_id , device_name , ip_address , operating_mode , pump_state , location})
-        
-        if(saveDevice.validity === false) {
-            return res.status(500).json({
-                message : "Something Went Wrong"
-            })
-
-        }
-        return res.status(201).json({
-            savedDevice : saveDevice
-        })
-
-        
-        
-    } catch (error) {
-        res.status(500).json({
-            message : "Internal Server Error",
-            validity : Boolean(false)
-        })
-
-        throw new Error("Error in recordDeviceDetails in the deviceController");
+async function recordDeviceDetails(req, res) {
+  try {
+    const data = req.body || {};
+    if (!data.device_id) {
+      return res.status(400).json({
+        success: false,
+        message: "device_id is required",
+      });
     }
+    const result = await deviceService.recordDevice(data);
+    return res.status(result.created ? 201 : 200).json(result);
+  } catch (error) {
+    console.error("recordDeviceDetails error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to register device",
+    });
+  }
 }
 
-async function changeDeviceMode(req , res) {
-    try {
-
-        // wait for the command  ,device_id and mode from the request body
-        const {device_id , mode } = req.body;
-
-        if(!device_id || !mode) {
-            return res.status(400).json({
-                message : "Invalid Data Sent",
-                validity : Boolean(false)
-            })
-        }
-
-        if(mode !== "auto" && mode !== "manual") {
-            return res.status(400).json({
-                message : "Invalid Mode Sent",
-                validity : Boolean(false)
-            })
-        }   
-      
-
-        //check if it exist
-        const [checkDeviceExistance] = await db.excute("SELECT * FROM devices WHERE device_id = ?" , [device_id]);
-        if(checkDeviceExistance.length === 0 || !checkDeviceExistance[0].ip_address) {
-            return res.status(404).json({
-                message : "Device Not Found Or Ip Not There",
-                validity : Boolean(false)
-            })
-        }
-
-        //get the ip of the device from the database
-        const deviceIp = checkDeviceExistance[0].ip_address;
-        const targetUrl = `http://${deviceIp}/device/mode`; // Assuming the device has an endpoint to change mode
-
-        const response = await fetch(targetUrl , {
-            method : "POST",
-            headers : {
-                "Content-Type" : "application/json"
-            },
-            body : JSON.stringify({mode}) 
-        })
-
-        if(!response.ok) {
-            return res.status(500).json({
-                message : "ESP32 FAILED TO CHANGE MODE",
-                validity : Boolean(false)
-            })
-        }
-        //update the mode
-        const updateMode = "UPDATE devices SET operating_mode = ? WHERE device_id = ?";
-        await db.excute(updateMode , [mode , device_id]);
-
-        return res.status(200).json({
-            message : "Device Mode Changed Successfully",
-            validity : Boolean(true)
-        })
-        
-    } catch (error) {
-
-        console.log("Error in changeDeviceMode in the soilContoller")
-        return res.status(500).json({
-            message : "Failed To Change Device Mode",
-            validity : Boolean(false)
-        })
-        
-    }
+async function getDevices(req, res) {
+  try {
+    const devices = await deviceService.getAllDevices();
+    return res.status(200).json({ success: true, data: devices });
+  } catch (error) {
+    console.error("getDevices error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch devices",
+    });
+  }
 }
 
+async function getDevice(req, res) {
+  try {
+    const deviceId = req.params.device_id;
+    const device = await deviceService.getDeviceById(deviceId);
+    if (!device) {
+      return res.status(404).json({
+        success: false,
+        message: "Device not found",
+      });
+    }
+    return res.status(200).json({ success: true, data: device });
+  } catch (error) {
+    console.error("getDevice error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch device",
+    });
+  }
+}
 
+async function updateDevice(req, res) {
+  try {
+    const deviceId = req.params.device_id;
+    const updated = await deviceService.updateDevice(deviceId, req.body || {});
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: "Device not found",
+      });
+    }
+    return res.status(200).json({ success: true, data: updated });
+  } catch (error) {
+    console.error("updateDevice error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update device",
+    });
+  }
+}
 
-module.exports = {recordDeviceDetails , changeDeviceMode };
+async function deleteDevice(req, res) {
+  try {
+    const deviceId = req.params.device_id;
+    const deleted = await deviceService.deleteDevice(deviceId);
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Device not found",
+      });
+    }
+    return res.status(200).json({ success: true, message: "Device deleted" });
+  } catch (error) {
+    console.error("deleteDevice error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete device",
+    });
+  }
+}
+
+async function changeDeviceMode(req, res) {
+  try {
+    const data = req.body || {};
+    const deviceId = data.device_id ? String(data.device_id).trim() : "";
+    const mode = data.mode ? String(data.mode).trim() : "";
+
+    if (!deviceId || !mode) {
+      return res.status(400).json({
+        success: false,
+        message: "device_id and mode are required",
+      });
+    }
+    if (mode !== "auto" && mode !== "manual") {
+      return res.status(400).json({
+        success: false,
+        message: "mode must be auto or manual",
+      });
+    }
+
+    const device = await deviceService.updateDeviceMode(deviceId, mode);
+    if (!device) {
+      return res.status(404).json({
+        success: false,
+        message: "Device not found",
+      });
+    }
+
+    let deviceNotified = false;
+    if (device.ip_address) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3000);
+        const response = await fetch(`http://${device.ip_address}/device/mode`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+        deviceNotified = response.ok;
+      } catch (_error) {
+        deviceNotified = false;
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Device mode updated",
+      device_id: deviceId,
+      mode,
+      deviceNotified,
+    });
+  } catch (error) {
+    console.error("changeDeviceMode error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to change device mode",
+    });
+  }
+}
+
+function streamDevice(req, res) {
+  return realtime.subscribe(
+    req.params.device_id,
+    res,
+    req.headers["last-event-id"],
+  );
+}
+
+async function setDeviceStatus(req, res) {
+  try {
+    const deviceId = String(req.params.device_id || "").trim();
+    const body = req.body || {};
+    const rawState = body.state ?? body.pump ?? body.pump_state ?? body.pumpState;
+    const state = rawState === undefined ? "" : String(rawState).trim().toUpperCase();
+    const mode = body.mode ? String(body.mode).trim().toUpperCase() : "";
+
+    if (!deviceId) {
+      return res.status(400).json({ success: false, message: "device_id is required" });
+    }
+    if (state !== "ON" && state !== "OFF" && mode !== "AUTO" && mode !== "MANUAL") {
+      return res.status(400).json({
+        success: false,
+        message: "Provide state as ON/OFF or mode as AUTO/MANUAL",
+      });
+    }
+
+    const device = await deviceService.getDeviceById(deviceId);
+    if (!device) {
+      return res.status(404).json({ success: false, message: "Device not found" });
+    }
+
+    const command = state
+      ? { action: "relay", state }
+      : { action: "mode", mode };
+    const cmdId = await mqttService.publishCommand(deviceId, command);
+
+    return res.status(202).json({
+      success: true,
+      message: "Command queued",
+      cmdId,
+      device_id: deviceId,
+      ...command,
+    });
+  } catch (error) {
+    console.error("setDeviceStatus error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to queue device command",
+    });
+  }
+}
+
+module.exports = {
+  recordDeviceDetails,
+  getDevices,
+  getDevice,
+  updateDevice,
+  deleteDevice,
+  changeDeviceMode,
+  streamDevice,
+  setDeviceStatus,
+};

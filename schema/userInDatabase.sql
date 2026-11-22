@@ -1,6 +1,6 @@
-CREATE USER "soilSystem"@"localhost" IDENTIFIED BY 'soilSystem123';
---create the database
+﻿-- Run as MySQL admin/root
 CREATE DATABASE IF NOT EXISTS soilSystemDB;
---grant all privileges to the user on the database
-GRANT ALL PRIVILEGES ON soilSystemDB.* TO "soilSystem"@"localhost";
 
+CREATE USER IF NOT EXISTS 'soilSystem'@'localhost' IDENTIFIED BY 'soilSystem123';
+GRANT ALL PRIVILEGES ON soilSystemDB.* TO 'soilSystem'@'localhost';
+FLUSH PRIVILEGES;

@@ -1,28 +1,105 @@
-@import url("https://googleapis.com");
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-roboto: "Roboto", sans-serif;
 }
 
-/* Desktop */
+:root {
+  color-scheme: light;
+
+  --app-veil: rgba(240, 247, 238, 0.84);
+  --shell-bg: rgba(255, 255, 255, 0.94);
+  --shell-border: rgba(255, 255, 255, 0.98);
+  --shell-shadow: 0 16px 40px rgba(16, 55, 30, 0.12);
+
+  --surface: #ffffff;
+  --surface-soft: #f6f9f4;
+  --surface-inset: #f1f6ef;
+  --border: #e2e9e1;
+
+  --text: #17251c;
+  --text-muted: #637166;
+  --text-soft: #8a978b;
+
+  --accent: #2b7d4e;
+  --accent-strong: #1f6b42;
+  --accent-soft: #e7f3ea;
+  --danger: #d25043;
+  --danger-soft: #fbe9e6;
+  --danger-border: #f2c3bd;
+  --warning: #b9791b;
+  --warning-soft: #fbf1da;
+  --warning-border: #ecd8a8;
+  --info: #2563a8;
+  --info-soft: #e7f0fb;
+  --info-border: #bfd5ee;
+
+  --nav-bg: #10251a;
+  --nav-border: rgba(255, 255, 255, 0.1);
+  --nav-text: #f0f6f1;
+  --nav-text-muted: rgba(226, 240, 229, 0.72);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --app-veil: rgba(4, 20, 11, 0.72);
+  --shell-bg: rgba(9, 26, 16, 0.8);
+  --shell-border: rgba(255, 255, 255, 0.12);
+  --shell-shadow: 0 16px 46px rgba(0, 0, 0, 0.42);
+
+  --surface: rgba(18, 37, 26, 0.72);
+  --surface-soft: rgba(12, 29, 19, 0.68);
+  --surface-inset: rgba(6, 20, 12, 0.55);
+  --border: rgba(255, 255, 255, 0.12);
+
+  --text: #f2f7f2;
+  --text-muted: rgba(226, 240, 229, 0.74);
+  --text-soft: rgba(226, 240, 229, 0.55);
+
+  --accent: #4ade80;
+  --accent-strong: #1f6b42;
+  --accent-soft: rgba(52, 211, 153, 0.14);
+  --danger: #f28073;
+  --danger-soft: rgba(242, 128, 115, 0.14);
+  --danger-border: rgba(242, 128, 115, 0.35);
+  --warning: #f0b44e;
+  --warning-soft: rgba(240, 180, 78, 0.14);
+  --warning-border: rgba(240, 180, 78, 0.35);
+  --info: #7cb2ee;
+  --info-soft: rgba(124, 178, 238, 0.14);
+  --info-border: rgba(124, 178, 238, 0.35);
+
+  --nav-bg: #09120c;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
 [data-sileo-viewport] {
-    width: 380px;
-    max-width: calc(100vw - 32px);
+  width: 380px;
+  max-width: calc(100vw - 32px);
 }
 
-/* Tablet */
 @media (max-width: 768px) {
-    [data-sileo-viewport] {
-        width: 340px;
-    }
+  [data-sileo-viewport] {
+    width: 340px;
+  }
 }
 
-/* Mobile */
 @media (max-width: 480px) {
-    [data-sileo-viewport] {
-        width: calc(100vw - 24px);
-        left: 12px !important;
-        right: 12px !important;
-    }
+  [data-sileo-viewport] {
+    width: calc(100vw - 24px);
+    left: 12px !important;
+    right: 12px !important;
+  }
 }
