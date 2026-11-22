@@ -21,7 +21,9 @@ describe("API e2e", () => {
     db.execute
       .mockResolvedValueOnce([[]])
       .mockResolvedValueOnce([{ affectedRows: 1 }])
+      .mockResolvedValueOnce([[]])
       .mockResolvedValueOnce([{ insertId: 21 }])
+      .mockResolvedValueOnce([[]])
       .mockResolvedValueOnce([{ insertId: 7 }]);
 
     const ingest = await request(app).post("/soil/status").send({

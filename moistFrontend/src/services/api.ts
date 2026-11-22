@@ -1,6 +1,7 @@
 ﻿import type { DeviceSnapshot } from "../types.ts";
 
-const baseUrl: string = (import.meta.env.VITE_API_BASE_URL as string | undefined) || "http://localhost:5000";
+const configuredBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) || "http://localhost:5000";
+const baseUrl: string = configuredBaseUrl.trim().replace(/\/+$/, "");
 
 export function getApiBaseUrl(): string {
   return baseUrl;

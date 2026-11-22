@@ -45,13 +45,17 @@ async function getSoilStatus(req, res) {
 
     return res.status(201).json({
       success: true,
-      message: result.autoRegistered
+      message: !result.dbWritten
+        ? "Soil reading unchanged - no database write needed"
+        : result.autoRegistered
         ? "Soil reading recorded and device auto-registered"
         : "Soil reading recorded successfully",
       device_id: String(deviceId),
       insertId: result.insertId,
       autoRegistered: result.autoRegistered,
       alertCreated: result.alertCreated,
+      dbWritten: result.dbWritten,
+      changedFields: result.changedFields,
     });
   } catch (error) {
     console.error("getSoilStatus error:", error.message);

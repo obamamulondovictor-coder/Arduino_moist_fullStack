@@ -3,6 +3,7 @@ const deviceService = require("./device.service");
 const realtime = require("./realtime.service");
 
 const DRY_THRESHOLD = 30.0;
+const DB_CHANGE_TOLERANCE = 0.1;
 
 function toNumber(value) {
   const n = Number(value);
@@ -35,6 +36,18 @@ function toDate(value) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+function numericChanged(nextValue, previousValue) {
+  if (nextValue === null || nextValue === undefined) {
+    return previousValue !== null && previousValue !== undefined;
+  }
+  if (previousValue === null || previousValue === undefined) return true;
+  return Math.abs(Number(nextValue) - Number(previousValue)) > DB_CHANGE_TOLERANCE;
+}
+
+function exactChanged(nextValue, previousValue) {
+  return nextValue !== previousValue;
+}
+
 async function recordSoilReading(data) {
   const deviceId = data.device_id ? String(data.device_id).trim() : "";
   const moisture = toNumber(data.moisture);
@@ -63,57 +76,123 @@ async function recordSoilReading(data) {
     firmware_version: data.firmware_version,
   });
 
-  let result;
-  try {
-    [result] = await db.execute(
-      `INSERT INTO soil_readings
-         (device_id, moisture, temperature, mode, tank_level, air_humidity,
-          signal_strength, sensor_valid, pump_state, pump_started_at,
-          control_reason, firmware_version)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        deviceId,
-        moisture,
-        temperature,
-        mode || "standard",
-        toNumber(data.tank_level),
-        toNumber(data.air_humidity),
-        toNumber(data.signal_strength),
-        toSensorValid(data.sensor_valid),
-        toPumpState(data.pump_state),
-        toDate(data.pump_started_at),
-        cleanText(data.control_reason),
-        cleanText(data.firmware_version, 50),
-      ],
-    );
-  } catch (error) {
-    if (!/unknown column/i.test(error.message)) throw error;
-    [result] = await db.execute(
-      "INSERT INTO soil_readings (device_id, moisture, temperature, mode) VALUES (?, ?, ?, ?)",
-      [deviceId, moisture, temperature, mode || "standard"],
-    );
+  const tankLevel = toNumber(data.tank_level);
+  const airHumidity = toNumber(data.air_humidity);
+  const signalStrength = toNumber(data.signal_strength);
+  const sensorValid = toSensorValid(data.sensor_valid);
+  const pumpState = toPumpState(data.pump_state);
+  const pumpStartedAt = toDate(data.pump_started_at);
+  const controlReason = cleanText(data.control_reason);
+  const firmwareVersion = cleanText(data.firmware_version, 50);
+  const readingMode = mode || "standard";
+
+  const [latestRows] = await db.execute(
+    `SELECT moisture, temperature, tank_level, pump_state, mode, sensor_valid, firmware_version
+     FROM soil_readings
+     WHERE device_id = ?
+     ORDER BY id DESC
+     LIMIT 1`,
+    [deviceId],
+  );
+  const latest = latestRows[0] || null;
+  const changedFields = [];
+
+  if (!latest || numericChanged(moisture, latest.moisture)) changedFields.push("moisture");
+  if (!latest || numericChanged(temperature, latest.temperature)) changedFields.push("temperature");
+  if (!latest || numericChanged(tankLevel, latest.tank_level)) changedFields.push("tank_level");
+  if (!latest || exactChanged(pumpState, latest.pump_state)) changedFields.push("pump_state");
+  if (!latest || exactChanged(readingMode, latest.mode)) changedFields.push("mode");
+  if (
+    !latest ||
+    exactChanged(sensorValid, latest.sensor_valid === null || latest.sensor_valid === undefined ? null : Number(latest.sensor_valid))
+  ) {
+    changedFields.push("sensor_valid");
+  }
+  if (!latest || exactChanged(firmwareVersion, latest.firmware_version)) {
+    changedFields.push("firmware_version");
+  }
+
+  const dbWritten = changedFields.length > 0;
+  let result = null;
+  if (dbWritten) {
+    try {
+      [result] = await db.execute(
+        `INSERT INTO soil_readings
+           (device_id, moisture, temperature, mode, tank_level, air_humidity,
+            signal_strength, sensor_valid, pump_state, pump_started_at,
+            control_reason, firmware_version)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          deviceId,
+          moisture,
+          temperature,
+          readingMode,
+          tankLevel,
+          airHumidity,
+          signalStrength,
+          sensorValid,
+          pumpState,
+          pumpStartedAt,
+          controlReason,
+          firmwareVersion,
+        ],
+      );
+    } catch (error) {
+      if (!/unknown column/i.test(error.message)) throw error;
+      [result] = await db.execute(
+        "INSERT INTO soil_readings (device_id, moisture, temperature, mode) VALUES (?, ?, ?, ?)",
+        [deviceId, moisture, temperature, readingMode],
+      );
+    }
   }
 
   let alertCreated = false;
   if (moisture < DRY_THRESHOLD) {
-    await db.execute(
-      "INSERT INTO soil_alerts (device_id, moisture_level, alert_message) VALUES (?, ?, ?)",
-      [deviceId, moisture, "Soil moisture critically low - watering recommended"],
+    const [alertRows] = await db.execute(
+      `SELECT moisture_level FROM soil_alerts
+       WHERE device_id = ?
+       ORDER BY id DESC
+       LIMIT 1`,
+      [deviceId],
     );
-    alertCreated = true;
+    const lastAlert = alertRows[0]?.moisture_level;
+    const wasDry =
+      lastAlert !== null &&
+      lastAlert !== undefined &&
+      Number.isFinite(Number(lastAlert)) &&
+      Number(lastAlert) < DRY_THRESHOLD;
+
+    if (!wasDry) {
+      await db.execute(
+        "INSERT INTO soil_alerts (device_id, moisture_level, alert_message) VALUES (?, ?, ?)",
+        [deviceId, moisture, "Soil moisture critically low - watering recommended"],
+      );
+      alertCreated = true;
+    }
   }
 
-  realtime.publish(deviceId, {
-    reason: "telemetry",
-    at: Date.now(),
+  realtime.publishEvent(deviceId, "telemetry", {
+    deviceId,
     moisture,
     temperature,
+    tankLevel,
+    airHumidity,
+    signalStrength,
+    sensorValid: Boolean(sensorValid),
+    mode: readingMode,
+    pumpState,
+    firmwareVersion,
+    at: Date.now(),
+    dbWritten,
+    changedFields,
   });
 
   return {
-    insertId: result.insertId,
+    insertId: result?.insertId ?? null,
     autoRegistered: deviceResult.created,
     alertCreated,
+    dbWritten,
+    changedFields,
   };
 }
 

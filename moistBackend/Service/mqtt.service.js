@@ -1,11 +1,11 @@
 const mqtt = require("mqtt");
-const db = require("../config/db");
 const deviceService = require("./device.service");
 const soilService = require("./soilService.service");
 const realtime = require("./realtime.service");
 const { getSnapshot } = require("./snapshot.service");
 
 const TOPIC_PREFIX = (process.env.MQTT_TOPIC_PREFIX || "devices").replace(/^\/+|\/+$/g, "");
+const MAX_DEVICE_ID_LENGTH = 255;
 const CLIENT_ID = process.env.MQTT_CLIENT_ID || `agrisense-backend-${process.pid}`;
 const MQTT_URL =
   process.env.MQTT_URL ||
@@ -26,6 +26,25 @@ let client = null;
 let started = false;
 const pendingCommands = new Map();
 const offlineCommands = new Map();
+const rejectedDeviceIds = new Set();
+
+function normalizeDeviceId(value) {
+  const deviceId = String(value || "").trim();
+  if (!deviceId || deviceId.length > MAX_DEVICE_ID_LENGTH) return null;
+  if (!/^[A-Za-z0-9._:-]+$/.test(deviceId)) return null;
+  return deviceId;
+}
+
+function warnRejectedDeviceId(value, payload = {}) {
+  const deviceIdPreview = String(value || "").slice(0, MAX_DEVICE_ID_LENGTH + 1);
+  const deviceName = payload.deviceName || payload.device_name || null;
+  const key = `${deviceIdPreview}|${deviceName || ""}`;
+  if (rejectedDeviceIds.has(key)) return;
+  rejectedDeviceIds.add(key);
+  console.warn(
+    `MQTT device rejected: device_id=${JSON.stringify(deviceIdPreview)} device_name=${JSON.stringify(deviceName)} reason=empty, invalid, or >${MAX_DEVICE_ID_LENGTH} chars`,
+  );
+}
 
 function topic(deviceId, suffix) {
   return `${TOPIC_PREFIX}/${deviceId}/${suffix}`;
@@ -102,14 +121,6 @@ async function handleTelemetry(deviceId, payload) {
   });
 
   publish(deviceId, "status", { online: true, reason: "telemetry" }, 1, true);
-  realtime.publishEvent(deviceId, "telemetry", {
-    deviceId,
-    moisture: Number(moisture),
-    temperature: Number(temperature),
-    tankLevel: payload.tankLevel ?? payload.tank_level ?? null,
-    pumpState,
-    at: Date.now(),
-  });
 }
 
 async function handleStatus(deviceId, payload) {
@@ -122,9 +133,7 @@ async function handleStatus(deviceId, payload) {
       device_name: payload.deviceName || payload.device_name,
       status,
     });
-    if (online) {
-      await db.execute("UPDATE devices SET last_seen = NOW() WHERE device_id = ?", [deviceId]);
-    }
+    await deviceService.touchDeviceLastSeen(deviceId, status);
   } catch (error) {
     console.error("MQTT status persist failed:", error.message);
   }
@@ -177,9 +186,23 @@ async function handleAck(deviceId, payload) {
 async function handleMessage(topicName, message) {
   const parts = topicName.split("/");
   if (parts.length !== 3 || parts[0] !== TOPIC_PREFIX) return;
-  const deviceId = decodeURIComponent(parts[1]);
+
   const suffix = parts[2];
   const payload = parsePayload(message);
+
+  let rawDeviceId = parts[1];
+  try {
+    rawDeviceId = decodeURIComponent(rawDeviceId);
+  } catch {
+    warnRejectedDeviceId(rawDeviceId, payload);
+    return;
+  }
+
+  const deviceId = normalizeDeviceId(rawDeviceId);
+  if (!deviceId) {
+    warnRejectedDeviceId(rawDeviceId, payload);
+    return;
+  }
 
   try {
     if (suffix === "telemetry") await handleTelemetry(deviceId, payload);
@@ -277,5 +300,7 @@ module.exports = {
   publishCommand,
   publishConfig,
   close,
+  normalizeDeviceId,
+  MAX_DEVICE_ID_LENGTH,
   isConnected: () => Boolean(client && client.connected),
 };
