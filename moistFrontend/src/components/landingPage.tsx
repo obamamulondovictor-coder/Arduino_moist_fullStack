@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import "../styles/landing.style.css";
 import { Link } from "react-router";
 import { FaArrowRight, FaPhoneAlt } from "react-icons/fa";
 import { sileo, Toaster } from "sileo";
 
-
 export default function LandingPage() {
-  type ToastPosition = "bottom-left" | "top-center" | "bottom-center" | "bottom-right";
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  const [deskTopPos, setDeskTopPos] = useState<ToastPosition>("bottom-left");
+  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 640);
+  const [deskTopPos, setDeskTopPos] = useState<"bottom-left" | "top-center" | "bottom-center" | "bottom-right">("bottom-left");
+  const [tourButton, setTourButton] = useState<boolean>(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -16,31 +17,39 @@ export default function LandingPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // controll the button to start tour
+
+  useEffect(() => {
+    const timer = setTimeout(() =>{setTourButton(true)} , 6000)
+    
+    return () => clearTimeout(timer)
+
+  } , [])
+
   function handleProjectInfoClick() {
-    const targetPos: ToastPosition = isMobile ? "top-center" : "bottom-right";
+    const targetPos: "bottom-left" | "top-center" | "bottom-center" | "bottom-right" = isMobile ? "top-center" : "bottom-right";
     setDeskTopPos(targetPos);
 
-    const mode = localStorage.getItem("theme") || "white";
+    const mode: string = localStorage.getItem("theme") || "white";
 
     sileo.info({
       title: "Project In Progress",
       description:
-        "This is the system of the smart irrigation with soil moisture sensor project. The project is still in progress and will be updated soon.",
+        "Smart irrigation and soil moisture monitoring system. Static demo pages are ready for further integration.",
       position: targetPos,
       fill: mode === "dark" ? "#0f172a" : "#ffffff",
       styles: {
         title: mode === "dark" ? "text-white!" : "text-gray-900!",
         description: mode === "dark" ? "text-white/75! break-words!" : "text-gray-600! break-words!",
-        // container: "w-[92vw]! max-w-[400px]! mx-auto!",
       },
     });
   }
 
   function handleContactSupportClick() {
-    const targetPos: ToastPosition = isMobile ? "top-center" : "bottom-right";
+    const targetPos: "bottom-left" | "top-center" | "bottom-center" | "bottom-right" = "top-center";
     setDeskTopPos(targetPos);
 
-    const mode = localStorage.getItem("theme") || "white";
+    const mode: string = localStorage.getItem("theme") || "white";
 
     sileo.success({
       title: "Contact Information",
@@ -52,7 +61,7 @@ export default function LandingPage() {
         // container: "w-[92vw]! max-w-[400px]! mx-auto!",
       },
       description: (
-        <span className="text-emerald-600 dark:text-emerald-400 font-medium wrap-brak">
+        <span className="text-emerald-600 dark:text-emerald-400 font-medium break-words">
           For support, please contact us at: <br />
           <a
             href="mailto:obamamulondo6@gmail.com"
@@ -71,6 +80,53 @@ export default function LandingPage() {
         </span>
       ),
     });
+  }
+
+  const handleNavigation = () =>{
+    const driverObj = driver({
+      showProgress:true,
+      steps : [
+            {
+      element: "#goToDash",
+      popover: {
+        title: "Navigate To The Main Dashboard",
+        description: "Access All of the main dashboard content such and device management , and soil analytics",
+        side: "bottom",
+      },
+    },
+    {
+      element: "#projectInfo",
+      popover : {
+        title : "See all detail of the project information",
+        description : `This has a small project information all of the detail will be found on my Github Profile
+        <a href="https://github.com/obamamulondovictor-coder/Arduino_moist_fullStack" target="_blank" rel="noopener noreferrer" 
+                 style="display: inline-block; padding: 6px 14px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                 Visit My GitHub Profile
+              </a>`,
+        side: "bottom"
+      }
+    },
+    {
+      element : "#contactMe",
+      popover : {
+        title : "Contact The Developer of the system",
+        description: "Be able to contact the owner of the system and talk all in all for improvement or suggestion",
+        side : "bottom"
+      }
+    },
+  {
+     element : "#learnMore" ,
+     popover : {
+      title : "See more detail on this kind of projects",
+      description : "Other existing system like this project",
+      side : "bottom"
+     }
+  }
+
+      ]
+    })
+
+    driverObj.drive();
   }
 
   return (
@@ -140,6 +196,7 @@ export default function LandingPage() {
             text-sm sm:text-base
             hover:shadow-lg hover:shadow-emerald-500/30
           "
+          id="goToDash"
         >
           Get to The Dashboard
           <span className="text-white inline-block group-hover:text-gray-200 transition-colors duration-300">
@@ -185,6 +242,7 @@ export default function LandingPage() {
               text-sm sm:text-base cursor-pointer
             "
             onClick={handleProjectInfoClick}
+            id="projectInfo"
           >
             Project Information
           </button>
@@ -201,6 +259,7 @@ export default function LandingPage() {
               text-sm sm:text-base cursor-pointer
             "
             onClick={handleContactSupportClick}
+            id="contactMe"
           >
             Contact Support
           </button>
@@ -210,11 +269,39 @@ export default function LandingPage() {
             className="text-emerald-300 transition-colors duration-150 ease-out hover:text-emerald-100 hover:underline underline-offset-4 text-sm sm:text-base"
             target="_blank"
             rel="noopener noreferrer"
+            id="learnMore"
           >
             Learn More
           </a>
         </div>
       </div>
+
+
+      {/* 👉 ADD THIS BOTTOM-LEFT TOUR BUTTON HERE */}
+      {tourButton && (
+        <button
+          onClick={handleNavigation}
+          className="
+            fixed bottom-5 right-5 z-40
+            inline-flex items-center gap-2
+            px-4 py-2.5 rounded-full
+            bg-emerald-950/90 hover:bg-emerald-900
+            backdrop-blur-md
+            border border-emerald-400/40
+            text-emerald-200 hover:text-white
+            text-sm font-medium
+            shadow-xl shadow-black/40
+            transition-all duration-300
+            cursor-pointer
+          "
+        >
+          Take a Quick Tour
+        </button>
+      )}
+
     </div>
   );
 }
+
+
+    

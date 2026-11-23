@@ -1,74 +1,94 @@
 import { IoHomeOutline } from "react-icons/io5";
-import { MdOutlineBugReport } from "react-icons/md";
-import { TbReport } from "react-icons/tb";
-import { GoAlert } from "react-icons/go";
+import { MdOutlineBugReport, MdOutlineAnalytics } from "react-icons/md";
+import { IoIosNotificationsOutline, IoMdHelpCircleOutline } from "react-icons/io";
 import { CiSettings } from "react-icons/ci";
-import { IoIosHelpCircleOutline } from "react-icons/io";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "../hooks/useTheme";
+import "../styles/leftNav.style.css";
 
-import "../styles/leftNav.style.css"
+export default function LeftNavbar({
+  activePage,
+  setActivePage,
+}: {
+  activePage: string;
+  setActivePage: (page: string) => void;
+}) {
+  const { isDark, toggleTheme } = useTheme();
 
+  const handleNavigation = (page: string) => {
+    setActivePage(page);
+  };
 
+  const itemClass = (page: string): string => {
+    if (activePage === page) {
+      return "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all bg-emerald-500/30 border border-emerald-400/40 font-semibold text-white";
+    }
+    return "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all text-slate-300 hover:bg-white/10";
+  };
 
-export default function LeftNavbar() {
-    return (
-        <aside className="bg-emerald-950 w-72 h-screen p-6 flex flex-col justify-between shrink-0 select-none text-white border-r border-emerald-900/40">
-            {/* Top Brand Section */}
-            <div>
-                <div className="flex items-center gap-3 px-2 mb-10">
-                    <img src="logo.png" alt="Agri Sense Logo" className="w-10 h-10 rounded-full object-cover bg-emerald-800" />
-                    <div className="text-2xl">
-                        <h1 className="font-bold font-sans tracking-wide text-lg text-emerald-50 leading-tight">AgriSense</h1>
-                        <p className="text-xs text-gray-400 font-medium">Smart Agriculture</p>
-                    </div>
-                </div>
+  return (
+    <div
+      className="h-full w-64 shrink-0 overflow-y-auto overflow-x-hidden border-r p-4 text-white transition-colors duration-300"
+      style={{ background: "var(--nav-bg)", borderColor: "var(--nav-border)" }}
+    >
+      <div>
+        <div className="mb-8 flex items-center gap-3 px-1">
+          <img src="/logo.png" alt="AgriSense logo" className="h-10 w-10 object-contain" />
+          <div className="flex flex-col">
+            <span className="text-lg font-bold tracking-wide text-gray-100">AgriSense</span>
+            <span className="text-xs text-emerald-200/80">Smart Agriculture</span>
+          </div>
+        </div>
 
-                {/* Navigation Links */}
-                <nav className="space-y-1.5 font-medium text-sm">
-                    <a href="#dashboard" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-900/50">
-                        <span><IoHomeOutline /></span> Dashboard
-                    </a>
-                    <a href="#devices" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-emerald-200/70 hover:bg-emerald-900/60 hover:text-white transition">
-                        <span><MdOutlineBugReport /></span> Devices
-                    </a>
-                   
-                    <a href="#reports" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-emerald-200/70 hover:bg-emerald-900/60 hover:text-white transition">
-                        <span><TbReport /></span> Reports
-                    </a>
-                    <a href="#notifications" className="flex items-center justify-between px-4 py-3 rounded-2xl text-emerald-200/70 hover:bg-emerald-900/60 hover:text-white transition">
-                        <span className="flex items-center gap-3.5"><span><GoAlert /></span> Notifications</span>
-                        <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
-                    </a>
-                    <a href="#settings" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-emerald-200/70 hover:bg-emerald-900/60 hover:text-white transition">
-                        <span><CiSettings /></span> Settings
-                    </a>
-                    <a href="#help" className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-emerald-200/70 hover:bg-emerald-900/60 hover:text-white transition">
-                        <span><IoIosHelpCircleOutline /></span> Help & Support
-                    </a>
-                </nav>
-            </div>
+        <div className="flex flex-col gap-2">
+          <button onClick={() => handleNavigation("main")} className={itemClass("main")}>
+            <IoHomeOutline className="text-xl" />
+            Dashboard
+          </button>
+          <button onClick={() => handleNavigation("device")} className={itemClass("device")}>
+            <MdOutlineBugReport className="text-xl" />
+            Devices
+          </button>
+          <button onClick={() => handleNavigation("analytic")} className={itemClass("analytic")}>
+            <MdOutlineAnalytics className="text-xl" />
+            Reports
+          </button>
+          <button onClick={() => handleNavigation("notification")} className={itemClass("notification")}>
+            <IoIosNotificationsOutline className="text-xl" />
+            Notifications
+          </button>
+          <button onClick={() => handleNavigation("setting")} className={itemClass("setting")}>
+            <CiSettings className="text-xl" />
+            Settings
+          </button>
+          <button onClick={() => handleNavigation("help")} className={itemClass("help")}>
+            <IoMdHelpCircleOutline className="text-xl" />
+            Help & Support
+          </button>
+        </div>
+      </div>
 
-            {/* Bottom Promo & User Profile */}
-            <div className="space-y-4">
-                {/* Promo Card */}
-                <div className="crop-bg-image h-40 rounded-sm w-full relative">
-                    <div className="overlay-behind"></div>
-                 
-                </div>
+      <div className="mt-4 border-t pt-4" style={{ borderColor: "var(--nav-border)" }}>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="mb-2 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-left text-sm text-slate-200 transition hover:bg-white/10"
+          aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+        >
+          {isDark ? <Sun className="text-lg text-amber-300" /> : <Moon className="text-lg text-emerald-300" />}
+          <span>{isDark ? "Light theme" : "Dark theme"}</span>
+        </button>
 
-                {/* User Profile */}
-                <div className="flex items-center justify-between pt-3 border-t border-emerald-900">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-emerald-800 flex items-center justify-center font-bold text-sm text-emerald-200">
-                            CN
-                        </div>
-                        <div className="overflow-hidden">
-                            <h4 className="text-xs font-bold text-white truncate">Charles Niyomugabo</h4>
-                            <p className="text-[10px] text-emerald-400 truncate">Admin-Manager</p>
-                        </div>
-                    </div>
-                    <span className="text-emerald-400 text-xs">▼</span>
-                </div>
-            </div>
-        </aside>
-    );
+        <button onClick={() => handleNavigation("profile")} className={itemClass("profile")}>
+          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/30 text-sm font-bold">
+            OM
+          </div>
+          <div className="text-left text-sm">
+            <p className="font-medium">Obama M. Victor</p>
+            <p className="text-xs text-emerald-200/70">Admin</p>
+          </div>
+        </button>
+      </div>
+    </div>
+  );
 }

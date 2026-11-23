@@ -31,8 +31,8 @@ This guide walks you through setting up the MySQL database, configuring the modu
 
    -- 1. Devices Registry Table
    CREATE TABLE devices (
-     device_id VARCHAR(30) PRIMARY KEY,
-     device_name VARCHAR(100) NOT NULL,
+     device_id VARCHAR(255) PRIMARY KEY,
+     device_name VARCHAR(255) NOT NULL,
      location VARCHAR(100),
      status ENUM('active', 'inactive', 'maintenance') DEFAULT 'active',
      registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -41,7 +41,7 @@ This guide walks you through setting up the MySQL database, configuring the modu
    -- 2. Telemetry Readings Table
    CREATE TABLE soil_readings (
      id INT AUTO_INCREMENT PRIMARY KEY,
-     device_id VARCHAR(30) NOT NULL,
+     device_id VARCHAR(255) NOT NULL,
      moisture FLOAT NOT NULL,
      temperature FLOAT NOT NULL,
      mode VARCHAR(50) DEFAULT 'standard',
@@ -52,7 +52,7 @@ This guide walks you through setting up the MySQL database, configuring the modu
    -- 3. Critical Alerts Log Table
    CREATE TABLE soil_alerts (
      id INT AUTO_INCREMENT PRIMARY KEY,
-     device_id VARCHAR(30) NOT NULL,
+     device_id VARCHAR(255) NOT NULL,
      moisture_level FLOAT NOT NULL,
      alert_message VARCHAR(255) DEFAULT 'Soil moisture critically low - watering required',
      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -67,21 +67,43 @@ Install project dependencies:
 
 Bash
 npm install
-Create a .env file in the root of moistBackend/ and configure your credentials:
+Create a .env.local file in the root of moistBackend/ and configure your credentials (see .env.example):
 
 Code snippet
-PORT=3000
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_mysql_password
-DB_NAME=soil_monitoring_db
+PORT=5000
+MYSQL_HOST=localhost
+MYSQL_USER=soilSystem
+MYSQL_PASS=your_mysql_password
+MYSQL_DATABASE=soilSystemDB
+MQTT_URL=mqtt://broker.emqx.io:1883
+MQTT_TOPIC_PREFIX=devices
+MQTT_USER=
+MQTT_PASS=
+Leave MQTT_USER and MQTT_PASS blank for the public broker. Never commit .env.local.
+
 Start the backend server:
 
 Bash
-node server.js
-(Verify you see: 🚀 Server running on port 3000)
+npm run dev
+(Verify you see the server listening on port 5000 and MQTT connected.)
 
-🔌 Step 3: ESP32 Firmware & Hardware Setup
+🌐 Step 3: Frontend Setup (moistFrontend)
+From the repository root:
+
+Bash
+cd moistFrontend
+npm install
+Copy .env.example to .env and set the backend URL:
+
+Code snippet
+VITE_API_BASE_URL=http://localhost:5000
+Start the dashboard:
+
+Bash
+npm run dev
+For Vercel deployments, set VITE_API_BASE_URL in the project environment variables to the deployed backend URL (for example https://your-backend-domain.example). Never commit .env.
+
+🔌 Step 4: ESP32 Firmware & Hardware Setup
 Connect your soil moisture sensor analog output pin to an ESP32 ADC pin (e.g., GPIO 34).
 
 Open Arduino IDE, select your specific ESP32 board type, and choose the correct COM port.

@@ -1,52 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Firjar:wght@100..800&display=swap');
-
-.bg-image{
+.bg-image {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   background-image: url("../assets/landing_image.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-.overlay-behind{
-
+.overlay-behind {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 40, 20, 0.92) 0%,
+      rgba(0, 55, 28, 0.72) 40%,
+      rgba(0, 40, 20, 0.15) 100%
+    ),
+    linear-gradient(0deg, rgba(0, 35, 18, 0.75) 0%, transparent 65%);
 }
 
 .button-color {
-    background-color: #009966; /*    rgb(104, 192, 9) */
+  background-color: #009966;
 }
-
-.bg-image {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-}
-
-/* Agricultural dark green gradient */
-.overlay-behind {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(0, 40, 20, 0.92) 0%,
-            rgba(0, 55, 28, 0.72) 40%,
-            rgba(0, 40, 20, 0.15) 100%
-        ),
-        linear-gradient(
-            0deg,
-            rgba(0, 35, 18, 0.75) 0%,
-            transparent 65%
-        );
-}
-
 
 .firjar-font {
-  font-family: "Firjar", sans-serif;
-  font-optical-sizing: auto;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   font-weight: 400;
-  font-style: normal;
-  font-variation-settings:
-    "wdth" 100;
 }
